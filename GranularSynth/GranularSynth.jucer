@@ -3,8 +3,12 @@
 <JUCERPROJECT id="n88rpk" name="GranularSynth" projectType="guiapp" jucerVersion="5.4.1">
   <MAINGROUP id="ttWK0A" name="GranularSynth">
     <GROUP id="{D205520A-E4DC-4B7C-7C99-F1204242714E}" name="Source">
+      <FILE id="Lw8CHO" name="Envelope.h" compile="0" resource="0" file="Source/Envelope.h"/>
+      <FILE id="evguq3" name="Grain.cpp" compile="1" resource="0" file="Source/Grain.cpp"/>
+      <FILE id="yivPsr" name="Grain.h" compile="0" resource="0" file="Source/Grain.h"/>
       <FILE id="VlPdnA" name="GranularSynthComponent.h" compile="0" resource="0"
             file="Source/GranularSynthComponent.h"/>
+      <FILE id="i4THG6" name="WaveGenerator.h" compile="0" resource="0" file="Source/WaveGenerator.h"/>
       <FILE id="rnRTw1" name="GranularSynthComponent.cpp" compile="1" resource="0"
             file="Source/GranularSynthComponent.cpp"/>
       <FILE id="OGnJrY" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>

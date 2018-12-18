@@ -421,6 +421,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\Grain.cpp">
+      <Filter>GranularSynth\Source</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\GranularSynthComponent.cpp">
       <Filter>GranularSynth\Source</Filter>
     </ClCompile>
@@ -2328,7 +2331,16 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\Envelope.h">
+      <Filter>GranularSynth\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Grain.h">
+      <Filter>GranularSynth\Source</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\GranularSynthComponent.h">
+      <Filter>GranularSynth\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\WaveGenerator.h">
       <Filter>GranularSynth\Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\..\APIs\JUCE\modules\juce_audio_basics\audio_play_head\juce_AudioPlayHead.h">

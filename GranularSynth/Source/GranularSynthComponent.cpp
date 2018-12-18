@@ -7,12 +7,23 @@
 */
 
 #include "GranularSynthComponent.h"
+#include "Grain.h"
 
 //==============================================================================
-GranularSynthComponent::GranularSynthComponent()
+GranularSynthComponent::GranularSynthComponent() : waveGenerator(440.0, 48000.0), grainTest(WaveTableGenerator(), 0, 48000)
 {
-    // Make sure you set the size of the component after
-    // you add any child components.
+    // Setup the Frequency Slider and Enable it.
+    startingSample.setRange (0, 48000.0);
+    startingSample.setTextValueSuffix (" Sample");
+    startingSample.setNumDecimalPlacesToDisplay(0);
+    addAndMakeVisible (startingSample);
+
+    endingSample.setRange (0, 48000.0);
+    endingSample.setTextValueSuffix (" Sample");
+    endingSample.setNumDecimalPlacesToDisplay(0);
+    addAndMakeVisible (endingSample);
+    
+    // set size of the component
     setSize (800, 600);
 
     // specify the number of input and output channels that we want to open
@@ -39,13 +50,22 @@ void GranularSynthComponent::prepareToPlay (int samplesPerBlockExpected, double 
 
 void GranularSynthComponent::getNextAudioBlock (const AudioSourceChannelInfo& bufferToFill)
 {
-    // Your audio-processing code goes here!
+   grainTest.SetStartingSample(static_cast<int>(startingSample.getValue()));
+   grainTest.SetEndSample(static_cast<int>(endingSample.getValue()));
 
-    // For more details, see the help for AudioProcessor::getNextAudioBlock()
+    {
+        auto* buffer1 = bufferToFill.buffer->getWritePointer (0, bufferToFill.startSample);
+        auto* buffer2 = bufferToFill.buffer->getWritePointer (1, bufferToFill.startSample);
+     
+        for (auto sample = 0; sample < bufferToFill.numSamples; ++sample)
+        {
+          float waveSamp = grainTest();
+          buffer1[sample] = waveSamp;
+          buffer2[sample] = waveSamp;
+        }
+    }
 
-    // Right now we are not producing any data, in which case we need to clear the buffer
-    // (to prevent the output of random noise)
-    bufferToFill.clearActiveBufferRegion();
+    //bufferToFill.clearActiveBufferRegion();
 }
 
 void GranularSynthComponent::releaseResources()
@@ -57,17 +77,10 @@ void GranularSynthComponent::releaseResources()
 }
 
 //==============================================================================
-void GranularSynthComponent::paint (Graphics& g)
-{
-    // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
-
-    // You can add your drawing code here!
-}
 
 void GranularSynthComponent::resized()
 {
-    // This is called when the MainContentComponent is resized.
-    // If you add any child components, this is where you should
-    // update their positions.
+    startingSample.setBounds (100, 10, getWidth() - 110, 20);
+    endingSample.setBounds (100, 40, getWidth() - 110, 20);
+
 }

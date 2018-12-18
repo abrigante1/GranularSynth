@@ -9,6 +9,7 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "Grain.h"
 
 //==============================================================================
 /*
@@ -21,19 +22,22 @@ public:
     //==============================================================================
     GranularSynthComponent();
     ~GranularSynthComponent();
-
+    
     //==============================================================================
     void prepareToPlay (int samplesPerBlockExpected, double sampleRate) override;
     void getNextAudioBlock (const AudioSourceChannelInfo& bufferToFill) override;
     void releaseResources() override;
 
     //==============================================================================
-    void paint (Graphics& g) override;
     void resized() override;
 
 private:
     //==============================================================================
     // Your private member variables go here...
+    Slider startingSample;
+    Slider endingSample;
+    Grain grainTest;
+    WaveGenerator waveGenerator;
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GranularSynthComponent)

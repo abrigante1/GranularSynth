@@ -138,6 +138,7 @@
     <Lib/>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\Grain.cpp"/>
     <ClCompile Include="..\..\Source\GranularSynthComponent.cpp"/>
     <ClCompile Include="..\..\Source\Main.cpp"/>
     <ClCompile Include="..\..\..\..\..\..\APIs\JUCE\modules\juce_audio_basics\buffers\juce_AudioChannelSet.cpp">
@@ -1893,7 +1894,10 @@
     <ClCompile Include="..\..\JuceLibraryCode\include_juce_video.cpp"/>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\Envelope.h"/>
+    <ClInclude Include="..\..\Source\Grain.h"/>
     <ClInclude Include="..\..\Source\GranularSynthComponent.h"/>
+    <ClInclude Include="..\..\Source\WaveGenerator.h"/>
     <ClInclude Include="..\..\..\..\..\..\APIs\JUCE\modules\juce_audio_basics\audio_play_head\juce_AudioPlayHead.h"/>
     <ClInclude Include="..\..\..\..\..\..\APIs\JUCE\modules\juce_audio_basics\buffers\juce_AudioChannelSet.h"/>
     <ClInclude Include="..\..\..\..\..\..\APIs\JUCE\modules\juce_audio_basics\buffers\juce_AudioDataConverters.h"/>

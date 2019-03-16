@@ -1,7 +1,7 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2017
 
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GranularSynth - App", "GranularSynth_App.vcxproj", "{8FEE640E-0904-D02B-DCE6-5949DF8B18B3}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NewProject - App", "NewProject_App.vcxproj", "{8FEE640E-0904-D02B-DCE6-5949DF8B18B3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

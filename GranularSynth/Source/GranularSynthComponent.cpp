@@ -10,17 +10,19 @@
 #include "Grain.h"
 
 //==============================================================================
-GranularSynthComponent::GranularSynthComponent() : mWaveGenerator(440.0, 48000.0, SQUARE), grainExample(WaveTableGenerator(SQUARE), 0, 48000)
+GranularSynthComponent::GranularSynthComponent() : activeGrain(0, 0)
 {
     // Setup the Frequency Slider and Enable it.
-    mStartingSample.setRange (1, mWaveGenerator.getSamplingRate());
-    mStartingSample.setTextValueSuffix (" Sample");
-    mStartingSample.setNumDecimalPlacesToDisplay(0);
-    addAndMakeVisible (mStartingSample);
+    mCentroidSample.setRange (1, 2);
+    mCentroidSample.setTextValueSuffix (" Sample");
+    mCentroidSample.setNumDecimalPlacesToDisplay(0);
+    mCentroidSample.addListener(this);
+    addAndMakeVisible (mCentroidSample);
 
     mGrainDuration.setRange (0, 100);
     mGrainDuration.setTextValueSuffix (" ms");
     mGrainDuration.setNumDecimalPlacesToDisplay(0);
+    mGrainDuration.addListener(this);
     addAndMakeVisible (mGrainDuration);
 
     addAndMakeVisible(&mOpenFileButton);
@@ -28,25 +30,22 @@ GranularSynthComponent::GranularSynthComponent() : mWaveGenerator(440.0, 48000.0
     mOpenFileButton.onClick = [this] { openFile(); };
 
     addAndMakeVisible(&mPlayButton);
-    mPlayButton.setButtonText("PLay File");
+    mPlayButton.setButtonText("Play");
     mPlayButton.onClick = [this] { playFile(); };
     mPlayButton.setColour(TextButton::buttonColourId, Colours::green);
     mPlayButton.setEnabled(false);
 
     addAndMakeVisible(&mStopButton);
-    mStopButton.setButtonText("Stop File");
+    mStopButton.setButtonText("Stop");
     mStopButton.onClick = [this] { stopFile(); };
     mStopButton.setColour(TextButton::buttonColourId, Colours::red);
     mStopButton.setEnabled(false);
-
-
 
     // set size of the component
     setSize (800, 600);
 
     // Register the Audio File Reader
     mFormatManager.registerBasicFormats();
-    transportSource.addChangeListener(this);
 
     // specify the number of input and output channels that we want to open
     setAudioChannels (0, 2);
@@ -74,20 +73,21 @@ void GranularSynthComponent::prepareToPlay (int samplesPerBlockExpected, double 
 
 void GranularSynthComponent::getNextAudioBlock (const AudioSourceChannelInfo& bufferToFill)
 {
-   grainExample.SetStartingSample(static_cast<int>(mStartingSample.getValue() - 1));
-   grainExample.SetDuration(static_cast<int>(mGrainDuration.getValue()));
-
-    for (auto channel = 0; channel < bufferToFill.buffer->getNumChannels(); ++channel)
-    {
+   // Get the Next Audio Block if the Grain is Being Played
+   if (activeGrain.mIsPlaying)
+   {
+      for (auto channel = 0; channel < bufferToFill.buffer->getNumChannels(); ++channel)
+      {
         // Get a pointer to the start sample in the buffer for this audio output channel
-        auto* buffer = bufferToFill.buffer->getWritePointer (channel, bufferToFill.startSample);
+        auto* buffer = bufferToFill.buffer->getWritePointer(channel, bufferToFill.startSample);
+
         // Fill the required number of samples with noise between -0.125 and +0.125
         for (auto sample = 0; sample < bufferToFill.numSamples; ++sample)
         {
-          float test = grainExample();
-          buffer[sample] = test;
+          buffer[sample] = activeGrain(channel);
         }
-    }
+      }
+   }
 }
 
 void GranularSynthComponent::releaseResources()
@@ -98,29 +98,25 @@ void GranularSynthComponent::releaseResources()
     // For more details, see the help for AudioProcessor::releaseResources()
 }
 
+void GranularSynthComponent::sliderValueChanged(Slider * slider)
+{
+  if (slider == &mCentroidSample)
+    activeGrain.SetCentroidSample(static_cast<int>(mCentroidSample.getValue()));
+  else if (slider == &mGrainDuration)
+    activeGrain.SetDuration(static_cast<int>(mGrainDuration.getValue()));
+}
+
 //==============================================================================
 
 void GranularSynthComponent::resized()
 {
-    mStartingSample.setBounds (100, 10, getWidth() - 110, 20);
+    mCentroidSample.setBounds (100, 10, getWidth() - 110, 20);
     mGrainDuration.setBounds (100, 40, getWidth() - 110, 20);
 
-    mOpenFileButton.setBounds (10, 10, getWidth() - 20, 20);
-    mPlayButton.setBounds (10, 40, getWidth() - 20, 20);
-    mStopButton.setBounds (10, 70, getWidth() - 20, 20);
+    mOpenFileButton.setBounds (10, 70, getWidth() - 20, 20);
+    mPlayButton.setBounds (10, 90, getWidth() - 20, 20);
+    mStopButton.setBounds (10, 110, getWidth() - 20, 20);
 
-}
-
-void GranularSynthComponent::changeListenerCallback(ChangeBroadcaster* source)
-{
-  // Update the Transport State based on the Transport Source
-  if(source == &transportSource)
-  {
-    if(transportSource.isPlaying())
-      changeState(TransportState::PLAYING);
-    else
-      changeState(TransportState::STOPPED);
-  }
 }
 
 //==============================================================================
@@ -136,12 +132,12 @@ void GranularSynthComponent::changeState(TransportState newState)
       case TransportState::STOPPED:
         mStopButton.setEnabled (false);
         mPlayButton.setEnabled (true);
-        transportSource.setPosition (0.0);
         break;
 
       case TransportState::STARTING:
         mPlayButton.setEnabled (false);
-        transportSource.start();
+        activeGrain.mIsPlaying = true;
+        changeState(TransportState::PLAYING);
         break;
 
       case TransportState::PLAYING:
@@ -149,7 +145,8 @@ void GranularSynthComponent::changeState(TransportState newState)
         break;
 
       case TransportState::STOPPING:
-        transportSource.stop();
+        activeGrain.Reset();
+        changeState(TransportState::STOPPED);
         break;
     }
   }
@@ -157,6 +154,9 @@ void GranularSynthComponent::changeState(TransportState newState)
 
 void GranularSynthComponent::openFile()
 {
+  // Close the Audio Thread While Opening A File
+  shutdownAudio();
+  
   FileChooser chooser("Select a WAV file to play...", {}, "*.wav");
   
   // Open File Browser
@@ -165,21 +165,26 @@ void GranularSynthComponent::openFile()
     auto file = chooser.getResult();
     auto* reader = mFormatManager.createReaderFor(file);
 
+    // Load File into the Grain
     if (reader != nullptr)
     {
-      // Create a New AudioFormatReader
-      std::unique_ptr<AudioFormatReaderSource> newSource (new AudioFormatReaderSource(reader, true));
-
-      // Load the Source into the Transport
-      transportSource.setSource(newSource.get(), 0, nullptr, reader->sampleRate);
-
       // Enable the PlayButton
       mPlayButton.setEnabled(true);
 
-      // Reset the Main Reader Source
-      mReaderSource.reset(newSource.release());
-    }
+      // Set the Active Grain's Source Audio File to the New Source
+      activeGrain.SetAudioSource(*reader);
 
+      // Update the Starting Sample Slider Range
+      mCentroidSample.setRange (1, activeGrain.GetSize());
+      mCentroidSample.setTextValueSuffix (" Sample");
+      mCentroidSample.setNumDecimalPlacesToDisplay(0);
+
+      // Turn Back on the Audio Thread
+      setAudioChannels(0, reader->numChannels);
+
+      // Clear the File Reader From Memory
+      delete reader;
+    }
   }
 }
 

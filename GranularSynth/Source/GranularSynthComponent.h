@@ -20,8 +20,8 @@
     The GranularSynthComponent is the Core Class that Manages the Entire GranularSynth
  */
 class GranularSynthComponent   : public AudioAppComponent,
-                                 public ChangeListener
-{
+                                 public Slider::Listener 
+{ 
 public:
     //==============================================================================
     
@@ -42,10 +42,10 @@ public:
     void getNextAudioBlock (const AudioSourceChannelInfo& bufferToFill) override;
     void releaseResources() override;
 
+    void sliderValueChanged(Slider* slider) override;
+
     //==============================================================================
     void resized() override;
-
-    void changeListenerCallback(ChangeBroadcaster* source) override;
 
 private:
     //================================VARIABLES=====================================
@@ -56,7 +56,7 @@ private:
     TextButton mPlayButton;       //<! Button Used to Play an opened Audio File
     TextButton mStopButton;       //<! Button Used to Stop an Opened Audio File
 
-    Slider mStartingSample;       //<! Slider Designating the Starting Sample of a Grain
+    Slider mCentroidSample;       //<! Slider Designating the Starting Sample of a Grain
     Slider mGrainDuration;        //<! Slider Designating the Duration of a Grain
 
     //----- Data ------//
@@ -73,15 +73,11 @@ private:
         STOPPING
     };
 
-    AudioFormatManager mFormatManager;                      //<! Manages Valid Audio Formats
-    std::unique_ptr<AudioFormatReaderSource> mReaderSource; //<! Reads an Audio Source File
-    AudioTransportSource transportSource;                   //<! Controls Playback of the Audio Source File
-    TransportState state;                                   //<! Determines the Current Audio Playback State
+    AudioFormatManager mFormatManager;  //<! Manages Valid Audio Formats
+    TransportState state;               //<! Determines the Current Audio Playback State
 
-    std::vector<Grain> mGrains;   //<! Vector of Grains 
-    Grain grainExample;           //<! Used to Test the features of a single grain. 
-
-    WaveGenerator mWaveGenerator; //<! Generates Primative Waveforms
+    std::vector<GrainCloud> mGrains;   //<! Vector of Grains 
+    GrainCloud activeGrain;            //<! Reference to the Current Active grain. 
 
     //================================FUNCTIONS=====================================
      

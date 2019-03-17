@@ -33,17 +33,16 @@ public:
   /**
 	 *\Grain constructor
 	 *\brief: Generates a Grain from a waveform generator
-   *\param: WaveTable - Wave Table used to Generate a Waveform
-   *\param: StartingSample - Sample to Start the Grain 
-   *\param: Duration - Duration of the Grain
+   *\param: int StartingSample - Sample to Start the Grain 
+   *\param: int Duration - Duration of the Grain
 	 */
-  GrainCloud(int startingSample_, int duration);
+  GrainCloud(int startingSample_ = 1, int duration = 0);
 
   /** 
    *\Grain () operator
    *\brief: Plays a sample of the Grains (from WAV form)
-   *\param: Channel of an Audio Buffer to Play Sample From
-   *\return: Current Sample of the Grain
+   *\param: int channel - Channel of an Audio Buffer to Play Sample From
+   *\return: float - Current Sample of the Grain
    */
   float operator()(int channel);
 
@@ -58,23 +57,31 @@ public:
   /**
    *\fn: SetStartingSample
    *\brief: Sets the Starting Sample of a Grain
-   *\param: StartingSample - Sample to Start the Grain
+   *\param: int startingSample - Sample to Start the Grain
    */
   void SetCentroidSample(int startingSample);
 
   /**
    *\fn: SetDuration
    *\brief: Sets the Duration of the Grain, and updates the Sample Delta and Ending Sample
-   *\param: Duration - Duration (in ms) of the Grain
+   *\param: int duration - duration (in ms) of the Grain
    */
   void SetDuration(int duration);
 
   /**
    *\fn: SetAudioSource
    *\brief: Sets the Audio Source of the Grain File and Updates The Grain's Properties
-   *\param: audioReader - Reader Containing The New Audio File
+   *\param: AudioFormatReader& audioReader - Reader Containing The New Audio File
    */
   void SetAudioSource(AudioFormatReader& audioReader);
+
+  /**
+   *\fn: SetCloudSize
+   *\brief: Sets the Cloud Size
+   *\param: int size - number of grains in the cloud
+   */
+  void SetCloudSize(int size);
+  
 
   /**
    *\fn: GetSize
@@ -92,7 +99,7 @@ public:
   /**
    *\fn: HasValidWAVFile
    *\brief: Checks if the Grain Has a Valid WAV File
-   *\return: Boolean for Valid WAV file
+   *\return: Boolean - Valid WAV file
    */
   bool HasValidWAVFile()
   {
@@ -101,12 +108,10 @@ public:
 
   //! Boolean for if the Grain is currently being played
   bool mIsPlaying = false;
-
-  //!< Size of the Grain Cloud (Number of Grains to Play)
-  int mCloudSize;      
+  
 
   //!< Offset of where a Grain can start from
-  int mStartingOffset;
+  int mStartingOffset = 0; 
 
 private:
   //================================VARIABLES=====================================
@@ -117,23 +122,21 @@ private:
 
   struct GrainData
   {
-  int mCurrentSample[2]; //!< Current Playing Sample of a Grain
-  int mStartingSample;   //!< Actual Starting Sample for a Specific Grain
-  int mEndSample;        //!< Ending Sample of a Grain
-  bool mIsFinished;      //!< Boolean for whether or not the Grain needs to be replayed.
+    int mCurrentSample[2] = { 0, 0 }; //!< Current Playing Sample of a Grain
+    int mStartingSample = 0;          //!< Actual Starting Sample for a Specific Grain
+    int mEndSample = 0;               //!< Ending Sample of a Grain
+    bool mIsFinished = true;          //!< Boolean for whether or not the Grain needs to be replayed.
   };
-
-  int mCurrentSample[2]; //!< Current Playing Sample of a Grain
-  int mStartingSample;   //!< Actual Starting Sample for a Specific Grain
-  int mEndSample;        //!< Ending Sample of a Grain
-  bool mIsFinished;      //!< Boolean for whether or not the Grain needs to be replayed.
 
   //!< Vector Containing the Grains in the Grain Cloud
   std::vector<GrainData> grains; 
 
-  int mCentroidSample;   //!< The Centroid Sample for a Grain Cloud
-  int mDuration;         //!< Duration (in ms) of a Grain Cloud
-  int mSampleDelta;      //!< Delta Between the Starting Sample and the Ending Sample (determined by Duration)
+  //!< Size of the Grain Cloud (Number of Grains to Play)
+  int mCloudSize = 0; 
+
+  int mCentroidSample = 1;    //!< The Centroid Sample for a Grain Cloud
+  int mDuration = 0;          //!< Duration (in ms) of a Grain Cloud
+  int mSampleDelta = 0;       //!< Delta Between the Starting Sample and the Ending Sample (determined by Duration)
 
   int mWaveSize = 0;     //!< The Size of the Audio Waveform being used
   int mSamplingRate;     //!< Sampling Rate of the Audio used by the Grain Cloud
@@ -143,11 +146,25 @@ private:
   //================================FUNCTIONS=====================================
 
   /**
-   *\fn: GetRandomStartingSample
-   *\brief: Gets a Random Starting Sample Based off the CloudRange and the Centroid Sample
-   *\return: int - random starting sample
+   *\fn: RandomizeGrain
+   *\brief: Randomizes a Grain
+   *\param: GrainData& grain - Grain to Randomize Start and End Sample
    */
-  int GetRandomStartingSample();
+  void RandomizeGrain(GrainData& grain);
+
+  /**
+   *\fn: AddGrains
+   *\brief: Adds Grains from the GrainCloud
+   *\param: int count - number of grains to add (default - 1)
+   */
+  void AddGrains(int count = 1);
+
+  /**
+   *\fn: RemoveGrains
+   *\brief: Removes Grains from the GrainCloud
+   *\param: int count - number of grains to remove (default - 1)
+   */
+  void RemoveGrains(int count = 1);
 
 };
 

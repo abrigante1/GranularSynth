@@ -6,20 +6,18 @@
 // ------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------
 
-GrainCloud::GrainCloud(int startingSample_, int duration) : 
-  mCentroidSample(startingSample_)
-{
-  mCurrentSample[LEFT_CHANNEL] = mCentroidSample;
-  mCurrentSample[RIGHT_CHANNEL] = mCentroidSample;
-
+GrainCloud::GrainCloud(int startingSample_, int duration_)
+{ 
   mSamplingRate = 0;
-  SetDuration(duration);
+  SetDuration(duration_);
+  SetCentroidSample(startingSample_);
+  AddGrains();
 }
 
 
 // ------------------------------------------------------------------------------------
 
-float GrainCloud::operator()(int channel)
+/*float GrainCloud::operator()(int channel)
 { 
 
   // Check if we are finished getting the current grain
@@ -42,6 +40,45 @@ float GrainCloud::operator()(int channel)
     // Get the Current Sample From the Audio Buffer
   float sample = mAudioSourceBuffer->getSample(channel, mCurrentSample[channel]);
   ++mCurrentSample[channel];
+
+  return sample;
+}*/
+
+float GrainCloud::operator()(int channel)
+{
+  float sample = 0;
+
+  for (GrainData& grain : grains)
+  {
+     // Check if we are finished getting the current grain
+    if (mAudioSourceBuffer->getNumChannels() >= 2)
+    {
+      if ((grain.mCurrentSample[LEFT_CHANNEL] >= grain.mEndSample) && 
+          (grain.mCurrentSample[RIGHT_CHANNEL] >= grain.mEndSample))
+        grain.mIsFinished = true;
+    }
+    else if((grain.mCurrentSample[LEFT_CHANNEL] >= grain.mEndSample))
+      grain.mIsFinished = true;
+
+      // Restart the grain if we are using it after finishing.
+    if (grain.mIsFinished)
+    {
+      grain.mIsFinished = false;
+
+      // Randomize the Grain
+      RandomizeGrain(grain);
+    }
+
+    // Get the Current Sample From the Audio Buffer
+    sample += mAudioSourceBuffer->getSample(channel, grain.mCurrentSample[channel]);
+    ++grain.mCurrentSample[channel];
+  }
+
+  sample *= 0.3f;
+  if(sample > 1.0f)
+    return 1.0f;
+  else if(sample < -1.0f)
+    return -1.0f;
 
   return sample;
 }
@@ -73,13 +110,11 @@ void GrainCloud::SetCentroidSample(int startingSample)
 {
   // Update the Starting Sample, and Reset the Current Sample
   mCentroidSample = startingSample - 1;
-  mCurrentSample[LEFT_CHANNEL] = mCentroidSample;
-  mCurrentSample[RIGHT_CHANNEL] = mCentroidSample;
 
-  // Clamp the End Sample
-  mEndSample = mCentroidSample + mSampleDelta;
-  if(mEndSample >= mWaveSize)
-    mEndSample = (mWaveSize - 1);
+  for (GrainData& grain : grains)
+  {
+    RandomizeGrain(grain);
+  }
 }
 
 // ------------------------------------------------------------------------------------
@@ -90,10 +125,13 @@ void GrainCloud::SetDuration(int duration)
   mDuration = duration;
   mSampleDelta = static_cast<int>(mSamplingRate * (static_cast<float>(mDuration) / 1000.0f));
   
-  // Clamp the End Sample
-  mEndSample = mCentroidSample + mSampleDelta;
-  if(mEndSample >= mWaveSize)
-    mEndSample = (mWaveSize - 1);
+  for (GrainData& grain : grains)
+  {
+    // Clamp the End Sample
+    grain.mEndSample = grain.mStartingSample + mSampleDelta;
+    if (grain.mEndSample >= mWaveSize)
+      grain.mEndSample = (mWaveSize - 1);
+  }
 }
 
 // ------------------------------------------------------------------------------------
@@ -102,7 +140,7 @@ void GrainCloud::SetAudioSource(AudioFormatReader& newAudioFile)
 {
   // Update Grain Parameters
   mWaveSize =  static_cast<int>(newAudioFile.lengthInSamples);
-  mSamplingRate = newAudioFile.sampleRate;
+  mSamplingRate = static_cast<int>(newAudioFile.sampleRate);
 
   // Clear the Audio Source and Read the New WAV File
   mAudioSourceBuffer.reset(new AudioSampleBuffer(newAudioFile.numChannels, static_cast<int>(newAudioFile.lengthInSamples)));
@@ -112,17 +150,65 @@ void GrainCloud::SetAudioSource(AudioFormatReader& newAudioFile)
 
 // ------------------------------------------------------------------------------------
 
-void GrainCloud::Reset()
+void GrainCloud::SetCloudSize(int size)
 {
-  mIsFinished = true;
-  mIsPlaying = false;
+  if (size > mCloudSize)
+    AddGrains(size - mCloudSize);
+  else if (size < mCloudSize)
+    RemoveGrains(mCloudSize - size);
 }
 
 // ------------------------------------------------------------------------------------
 
-int GrainCloud::GetRandomStartingSample()
+
+void GrainCloud::RandomizeGrain(GrainData& grain)
 {
-  return Random().nextInt(Range<int>(-mStartingOffset, mStartingOffset));
+  if (mStartingOffset == 0 || (mCentroidSample - mStartingOffset) <= 0)
+    grain.mStartingSample = mCentroidSample;
+  else
+    grain.mStartingSample = Random().nextInt(Range<int>(mCentroidSample - mStartingOffset,
+                                                        mCentroidSample + mStartingOffset));
+    
+  grain.mCurrentSample[LEFT_CHANNEL] = grains.back().mStartingSample;
+  grain.mCurrentSample[RIGHT_CHANNEL] = grains.back().mStartingSample;
+
+  grain.mEndSample = grain.mStartingSample + mSampleDelta;
+  if (grain.mEndSample >= mWaveSize)
+    grain.mEndSample = (mWaveSize - 1);
+}
+
+// ------------------------------------------------------------------------------------
+
+void GrainCloud::AddGrains(int count)
+{
+  for (int i = 0; i < count; ++i)
+  {
+    grains.push_back(GrainData());
+    RandomizeGrain(grains.back());
+  }
+
+  mCloudSize += count;
+}
+
+// ------------------------------------------------------------------------------------
+
+void GrainCloud::RemoveGrains(int count)
+{
+  for(int i = 0; i < count; ++i)
+    grains.pop_back(); 
+
+  mCloudSize -= count;
+}
+
+// ------------------------------------------------------------------------------------
+
+
+void GrainCloud::Reset()
+{
+  for (GrainData& grain : grains)
+    grain.mIsFinished = true;
+ 
+  mIsPlaying = false;
 }
 
 // ------------------------------------------------------------------------------------

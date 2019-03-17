@@ -10,20 +10,36 @@
 #include "Grain.h"
 
 //==============================================================================
-GranularSynthComponent::GranularSynthComponent() : activeGrain(0, 0)
+GranularSynthComponent::GranularSynthComponent() : activeGrain()
 {
-    // Setup the Frequency Slider and Enable it.
-    mCentroidSample.setRange (1, 2);
-    mCentroidSample.setTextValueSuffix (" Sample");
-    mCentroidSample.setNumDecimalPlacesToDisplay(0);
-    mCentroidSample.addListener(this);
-    addAndMakeVisible (mCentroidSample);
+    // Centroid Sample Slider Setup
+    mCentroidSampleSlider.setRange (1, 2);
+    mCentroidSampleSlider.setTextValueSuffix (" Sample");
+    mCentroidSampleSlider.setNumDecimalPlacesToDisplay(0);
+    mCentroidSampleSlider.addListener(this);
+    addAndMakeVisible (mCentroidSampleSlider);
+  
+    // Gain Duration Slider Setup
+    mGrainDurationSlider.setRange (0, 100);
+    mGrainDurationSlider.setTextValueSuffix (" ms");
+    mGrainDurationSlider.setNumDecimalPlacesToDisplay(0);
+    mGrainDurationSlider.addListener(this);
+    addAndMakeVisible (mGrainDurationSlider);
 
-    mGrainDuration.setRange (0, 100);
-    mGrainDuration.setTextValueSuffix (" ms");
-    mGrainDuration.setNumDecimalPlacesToDisplay(0);
-    mGrainDuration.addListener(this);
-    addAndMakeVisible (mGrainDuration);
+    // Cloud Size Slider Setup
+    mCloudSizeSlider.setRange (1, 10);
+    mCloudSizeSlider.setTextValueSuffix (" grains");
+    mCloudSizeSlider.setNumDecimalPlacesToDisplay(0);
+    mCloudSizeSlider.addListener(this);
+    addAndMakeVisible (mCloudSizeSlider);
+
+    // Starting Offset Slider Setup
+    mStartingOffsetSlider.setRange (0, 10000);
+    mStartingOffsetSlider.setTextValueSuffix (" samples");
+    mStartingOffsetSlider.setNumDecimalPlacesToDisplay(0);
+    mStartingOffsetSlider.addListener(this);
+    addAndMakeVisible (mStartingOffsetSlider);
+
 
     addAndMakeVisible(&mOpenFileButton);
     mOpenFileButton.setButtonText("Open File...");
@@ -100,23 +116,29 @@ void GranularSynthComponent::releaseResources()
 
 void GranularSynthComponent::sliderValueChanged(Slider * slider)
 {
-  if (slider == &mCentroidSample)
-    activeGrain.SetCentroidSample(static_cast<int>(mCentroidSample.getValue()));
-  else if (slider == &mGrainDuration)
-    activeGrain.SetDuration(static_cast<int>(mGrainDuration.getValue()));
+  if (slider == &mCentroidSampleSlider)
+    activeGrain.SetCentroidSample(static_cast<int>(mCentroidSampleSlider.getValue()));
+  else if (slider == &mGrainDurationSlider)
+    activeGrain.SetDuration(static_cast<int>(mGrainDurationSlider.getValue()));
+  else if (slider == &mStartingOffsetSlider)
+    activeGrain.mStartingOffset = static_cast<int>(mStartingOffsetSlider.getValue());
+  else if (slider == &mCloudSizeSlider)
+    activeGrain.SetCloudSize(static_cast<int>(mCloudSizeSlider.getValue())); 
 }
 
 //==============================================================================
 
 void GranularSynthComponent::resized()
 {
-    mCentroidSample.setBounds (100, 10, getWidth() - 110, 20);
-    mGrainDuration.setBounds (100, 40, getWidth() - 110, 20);
+    int yValue = 10;
+    mCentroidSampleSlider.setBounds (100, (yValue), getWidth() - 110, 20);
+    mGrainDurationSlider.setBounds (100,  (yValue += 30), getWidth() - 110, 20);
+    mCloudSizeSlider.setBounds (100, (yValue += 30), getWidth() - 110, 20);
+    mStartingOffsetSlider.setBounds (100, (yValue += 30), getWidth() - 110, 20);
 
-    mOpenFileButton.setBounds (10, 70, getWidth() - 20, 20);
-    mPlayButton.setBounds (10, 90, getWidth() - 20, 20);
-    mStopButton.setBounds (10, 110, getWidth() - 20, 20);
-
+    mOpenFileButton.setBounds (10, (yValue += 30), getWidth() - 20, 20);
+    mPlayButton.setBounds (10, (yValue += 30), getWidth() - 20, 20);
+    mStopButton.setBounds (10, (yValue += 30), getWidth() - 20, 20);
 }
 
 //==============================================================================
@@ -175,9 +197,9 @@ void GranularSynthComponent::openFile()
       activeGrain.SetAudioSource(*reader);
 
       // Update the Starting Sample Slider Range
-      mCentroidSample.setRange (1, activeGrain.GetSize());
-      mCentroidSample.setTextValueSuffix (" Sample");
-      mCentroidSample.setNumDecimalPlacesToDisplay(0);
+      mCentroidSampleSlider.setRange (1, activeGrain.GetSize());
+      mCentroidSampleSlider.setTextValueSuffix (" Sample");
+      mCentroidSampleSlider.setNumDecimalPlacesToDisplay(0);
 
       // Turn Back on the Audio Thread
       setAudioChannels(0, reader->numChannels);

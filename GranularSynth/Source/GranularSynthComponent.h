@@ -52,12 +52,15 @@ private:
 
     //----- GUI Objects -----//
     
-    TextButton mOpenFileButton;   //<! Button Used to Open an Audio File
-    TextButton mPlayButton;       //<! Button Used to Play an opened Audio File
-    TextButton mStopButton;       //<! Button Used to Stop an Opened Audio File
+    TextButton mOpenFileButton;    //<! Button Used to Open an Audio File
+    TextButton mPlayButton;        //<! Button Used to Play an opened Audio File
+    TextButton mStopButton;        //<! Button Used to Stop an Opened Audio File
 
-    Slider mCentroidSample;       //<! Slider Designating the Starting Sample of a Grain
-    Slider mGrainDuration;        //<! Slider Designating the Duration of a Grain
+    Slider mCentroidSampleSlider;  //<! Slider Designating the Starting Sample of a Grain
+    Slider mGrainDurationSlider;   //<! Slider Designating the Duration of a Grain
+    Slider mStartingOffsetSlider;  //<! Slider Designating the Offset a Grain can use.
+    Slider mCloudSizeSlider;       //<! Slider Designating the Cloud Size of a Grain
+
 
     //----- Data ------//
 

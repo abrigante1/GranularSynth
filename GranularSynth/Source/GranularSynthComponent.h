@@ -60,6 +60,7 @@ private:
     Slider mGrainDurationSlider;   //<! Slider Designating the Duration of a Grain
     Slider mStartingOffsetSlider;  //<! Slider Designating the Offset a Grain can use.
     Slider mCloudSizeSlider;       //<! Slider Designating the Cloud Size of a Grain
+    Slider mPitchOffsetSlider;     //<! Slider Designating the Random Pitch Offset of a Grain
 
 
     //----- Data ------//

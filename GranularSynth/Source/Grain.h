@@ -46,14 +46,6 @@ public:
    */
   float operator()(int channel);
 
-  /** 
-   *\Grain () operator
-   *\brief: Plays a sample of the Grains (From WaveGenerator)
-   *\return: Current Sample of the Grain
-   *\DEPRECATED (for now)
-   */
-  //float operator()();
-
   /**
    *\fn: SetStartingSample
    *\brief: Sets the Starting Sample of a Grain
@@ -109,9 +101,11 @@ public:
   //! Boolean for if the Grain is currently being played
   bool mIsPlaying = false;
   
-
-  //!< Offset of where a Grain can start from
+  //! Offset of where a Grain can start from
   int mStartingOffset = 0; 
+
+  //! Pitch Offset (in semitones)
+  int mPitchOffset = 0;
 
 private:
   //================================VARIABLES=====================================
@@ -120,28 +114,36 @@ private:
   //! AudioSampleBuffer of the Grain's Audio Source WAV file.
   std::unique_ptr<AudioSampleBuffer> mAudioSourceBuffer; 
 
+  /**
+   *\struct: GrainData
+   *\brief:
+      The GrainData Struct contains data about a specific grain inside
+      a grain cloud. GrainData is used and managed by the GrainCloud class.
+   */
   struct GrainData
   {
-    int mCurrentSample[2] = { 0, 0 }; //!< Current Playing Sample of a Grain
+    float mCurrentSample[2] = { 0.0f, 0.0f }; //!< Current Playing Sample of a Grain
     int mStartingSample = 0;          //!< Actual Starting Sample for a Specific Grain
     int mEndSample = 0;               //!< Ending Sample of a Grain
+    
+    double mPitchScalar = 0.0f;        //!< Scalar Value for a Randomized Pitch Offset
+
     bool mIsFinished = true;          //!< Boolean for whether or not the Grain needs to be replayed.
   };
 
-  //!< Vector Containing the Grains in the Grain Cloud
+  //! Vector Containing the Grains in the Grain Cloud
   std::vector<GrainData> grains; 
 
-  //!< Size of the Grain Cloud (Number of Grains to Play)
-  int mCloudSize = 0; 
+  int mCloudSize = 0;       //!< Size of the Grain Cloud (Number of Grains to Play)
 
-  int mCentroidSample = 1;    //!< The Centroid Sample for a Grain Cloud
-  int mDuration = 0;          //!< Duration (in ms) of a Grain Cloud
-  int mSampleDelta = 0;       //!< Delta Between the Starting Sample and the Ending Sample (determined by Duration)
+  int mCentroidSample = 1;  //!< The Centroid Sample for a Grain Cloud
+  int mDuration = 0;        //!< Duration (in ms) of a Grain Cloud
+  int mSampleDelta = 0;     //!< Delta Between the Starting Sample and the Ending Sample (determined by Duration)
 
-  int mWaveSize = 0;     //!< The Size of the Audio Waveform being used
-  int mSamplingRate;     //!< Sampling Rate of the Audio used by the Grain Cloud
+  int mWaveSize = 0;        //!< The Size of the Audio Waveform being used
+  int mSamplingRate;        //!< Sampling Rate of the Audio used by the Grain Cloud
 
-  bool mHasValidWAVFile; //!< Boolean for whether or not the Grain has a valid WAV file.
+  bool mHasValidWAVFile;    //!< Boolean for whether or not the Grain has a valid WAV file.
 
   //================================FUNCTIONS=====================================
 

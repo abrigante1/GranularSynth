@@ -17,33 +17,6 @@ GrainCloud::GrainCloud(int startingSample_, int duration_)
 
 // ------------------------------------------------------------------------------------
 
-/*float GrainCloud::operator()(int channel)
-{ 
-
-  // Check if we are finished getting the current grain
-  if (mAudioSourceBuffer->getNumChannels() >= 2)
-  {
-    if ((mCurrentSample[LEFT_CHANNEL] >= mEndSample) && (mCurrentSample[RIGHT_CHANNEL] >= mEndSample))
-      mIsFinished = true;
-  }
-  else if((mCurrentSample[LEFT_CHANNEL] >= mEndSample))
-    mIsFinished = true;
-
-    // Restart the grain if we are using it after finishing.
-  if (mIsFinished)
-  {
-    mIsFinished = false;
-    mCurrentSample[LEFT_CHANNEL] = mCentroidSample;
-    mCurrentSample[RIGHT_CHANNEL] = mCentroidSample;
-  }
-
-    // Get the Current Sample From the Audio Buffer
-  float sample = mAudioSourceBuffer->getSample(channel, mCurrentSample[channel]);
-  ++mCurrentSample[channel];
-
-  return sample;
-}*/
-
 float GrainCloud::operator()(int channel)
 {
   float sample = 0;
@@ -70,11 +43,16 @@ float GrainCloud::operator()(int channel)
     }
 
     // Get the Current Sample From the Audio Buffer
-    sample += mAudioSourceBuffer->getSample(channel, grain.mCurrentSample[channel]);
-    ++grain.mCurrentSample[channel];
+    sample += (mAudioSourceBuffer->getSample(channel, 
+                                            static_cast<int>(grain.mCurrentSample[channel])));
+   
+    grain.mCurrentSample[channel] += static_cast<float>(grain.mPitchScalar);
+    if(grain.mCurrentSample[channel] >= static_cast<float>(mWaveSize))
+      grain.mCurrentSample[channel] = (static_cast<float>(mWaveSize) - 1.0f);
+    
   }
 
-  sample *= 0.3f;
+  sample *= 0.2f;
   if(sample > 1.0f)
     return 1.0f;
   else if(sample < -1.0f)
@@ -83,27 +61,6 @@ float GrainCloud::operator()(int channel)
   return sample;
 }
 
-// ------------------------------------------------------------------------------------
-
-/* float Grain::operator()()
-{
-  // Restart the grain if we are using it after finishing.
-  if (mIsFinished)
-  {
-    mIsFinished = false;
-    mCurrentSample[LEFT_CHANNEL] = mStartingSample;
-    mCurrentSample[RIGHT_CHANNEL] = mStartingSample;
-  }
-
-  float sample = waveTable[mCurrentSample[LEFT_CHANNEL]++];
-
-  // Check if we are finished getting the current grain
-  if (mCurrentSample[LEFT_CHANNEL] >= mEndSample)
-    mIsFinished = true;
-
-  return sample;
-} */
- 
 // ------------------------------------------------------------------------------------
 
 void GrainCloud::SetCentroidSample(int startingSample)
@@ -163,18 +120,40 @@ void GrainCloud::SetCloudSize(int size)
 
 void GrainCloud::RandomizeGrain(GrainData& grain)
 {
+  Random rand = Random();
+
+  // Ensure the Starting Smaple is non-negative
   if (mStartingOffset == 0 || (mCentroidSample - mStartingOffset) <= 0)
     grain.mStartingSample = mCentroidSample;
   else
-    grain.mStartingSample = Random().nextInt(Range<int>(mCentroidSample - mStartingOffset,
-                                                        mCentroidSample + mStartingOffset));
-    
-  grain.mCurrentSample[LEFT_CHANNEL] = grains.back().mStartingSample;
-  grain.mCurrentSample[RIGHT_CHANNEL] = grains.back().mStartingSample;
+  {
 
+    // Randomize the Starting Sample
+    grain.mStartingSample = rand.nextInt(Range<int>(mCentroidSample - mStartingOffset,
+                                                    mCentroidSample + mStartingOffset));
+
+    // Clamp the Starting Sample to be Within the WaveTable Range
+    if(grain.mStartingSample < 0)
+      grain.mStartingSample = 0;
+    else if(grain.mStartingSample >= mWaveSize)
+      grain.mStartingSample = (mWaveSize - 1);
+  }
+    
+  // Set the Current Sample to the Starting Sample
+  grain.mCurrentSample[LEFT_CHANNEL] = static_cast<float>(grains.back().mStartingSample);
+  grain.mCurrentSample[RIGHT_CHANNEL] = static_cast<float>(grains.back().mStartingSample);
+
+  // Clamp the End Sample to be Within the WaveTable Range
   grain.mEndSample = grain.mStartingSample + mSampleDelta;
   if (grain.mEndSample >= mWaveSize)
     grain.mEndSample = (mWaveSize - 1);
+  
+  // Randomize the Pitch 
+  int randomPitch = 0;
+  if(mPitchOffset > 0)
+    randomPitch = rand.nextInt(Range<int>(-mPitchOffset, mPitchOffset));
+
+  grain.mPitchScalar = std::pow(2.0f, static_cast<double>(randomPitch) / 12.0f);
 }
 
 // ------------------------------------------------------------------------------------

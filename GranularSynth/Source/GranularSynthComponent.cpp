@@ -20,7 +20,7 @@ GranularSynthComponent::GranularSynthComponent() : activeGrain()
     addAndMakeVisible (mCentroidSampleSlider);
   
     // Gain Duration Slider Setup
-    mGrainDurationSlider.setRange (0, 100);
+    mGrainDurationSlider.setRange (1, 1000);
     mGrainDurationSlider.setTextValueSuffix (" ms");
     mGrainDurationSlider.setNumDecimalPlacesToDisplay(0);
     mGrainDurationSlider.addListener(this);
@@ -40,22 +40,31 @@ GranularSynthComponent::GranularSynthComponent() : activeGrain()
     mStartingOffsetSlider.addListener(this);
     addAndMakeVisible (mStartingOffsetSlider);
 
+    // Pitch Offset Slider
+    mPitchOffsetSlider.setRange (0, 24);
+    mPitchOffsetSlider.setTextValueSuffix (" semitones");
+    mPitchOffsetSlider.setNumDecimalPlacesToDisplay(0);
+    mPitchOffsetSlider.addListener(this);
+    addAndMakeVisible (mPitchOffsetSlider);
 
-    addAndMakeVisible(&mOpenFileButton);
+    // Open File Button
     mOpenFileButton.setButtonText("Open File...");
     mOpenFileButton.onClick = [this] { openFile(); };
+    addAndMakeVisible(&mOpenFileButton);
 
-    addAndMakeVisible(&mPlayButton);
+    // Play Button
     mPlayButton.setButtonText("Play");
     mPlayButton.onClick = [this] { playFile(); };
     mPlayButton.setColour(TextButton::buttonColourId, Colours::green);
     mPlayButton.setEnabled(false);
+    addAndMakeVisible(&mPlayButton);
 
-    addAndMakeVisible(&mStopButton);
+    // Stop Button
     mStopButton.setButtonText("Stop");
     mStopButton.onClick = [this] { stopFile(); };
     mStopButton.setColour(TextButton::buttonColourId, Colours::red);
     mStopButton.setEnabled(false);
+    addAndMakeVisible(&mStopButton);
 
     // set size of the component
     setSize (800, 600);
@@ -124,6 +133,8 @@ void GranularSynthComponent::sliderValueChanged(Slider * slider)
     activeGrain.mStartingOffset = static_cast<int>(mStartingOffsetSlider.getValue());
   else if (slider == &mCloudSizeSlider)
     activeGrain.SetCloudSize(static_cast<int>(mCloudSizeSlider.getValue())); 
+  else if(slider == &mPitchOffsetSlider)
+    activeGrain.mPitchOffset = static_cast<int>(mPitchOffsetSlider.getValue());
 }
 
 //==============================================================================
@@ -135,6 +146,7 @@ void GranularSynthComponent::resized()
     mGrainDurationSlider.setBounds (100,  (yValue += 30), getWidth() - 110, 20);
     mCloudSizeSlider.setBounds (100, (yValue += 30), getWidth() - 110, 20);
     mStartingOffsetSlider.setBounds (100, (yValue += 30), getWidth() - 110, 20);
+    mPitchOffsetSlider.setBounds(100, (yValue += 30), getWidth() - 110, 20);
 
     mOpenFileButton.setBounds (10, (yValue += 30), getWidth() - 20, 20);
     mPlayButton.setBounds (10, (yValue += 30), getWidth() - 20, 20);
@@ -179,7 +191,7 @@ void GranularSynthComponent::openFile()
   // Close the Audio Thread While Opening A File
   shutdownAudio();
   
-  FileChooser chooser("Select a WAV file to play...", {}, "*.wav");
+  FileChooser chooser("Select a WAV file to play...", {}, "*.wav;*.flac");
   
   // Open File Browser
   if (chooser.browseForFileToOpen())
@@ -200,6 +212,13 @@ void GranularSynthComponent::openFile()
       mCentroidSampleSlider.setRange (1, activeGrain.GetSize());
       mCentroidSampleSlider.setTextValueSuffix (" Sample");
       mCentroidSampleSlider.setNumDecimalPlacesToDisplay(0);
+
+      // Reset the Values for all Sliders
+      //mCentroidSampleSlider.setValue(1, dontSendNotification);
+      //mGrainDurationSlider.setValue(1, dontSendNotification);
+      //mStartingOffsetSlider.setValue(1, dontSendNotification);
+      //mCloudSizeSlider.setValue(0, dontSendNotification);
+      //mPitchOffsetSlider.setValue(0, dontSendNotification);
 
       // Turn Back on the Audio Thread
       setAudioChannels(0, reader->numChannels);

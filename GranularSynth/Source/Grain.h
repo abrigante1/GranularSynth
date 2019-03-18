@@ -122,11 +122,11 @@ private:
    */
   struct GrainData
   {
-    float mCurrentSample[2] = { 0.0f, 0.0f }; //!< Current Playing Sample of a Grain
+    double mCurrentSample[2] = { 0.0, 0.0 }; //!< Current Playing Sample of a Grain
     int mStartingSample = 0;          //!< Actual Starting Sample for a Specific Grain
     int mEndSample = 0;               //!< Ending Sample of a Grain
     
-    double mPitchScalar = 0.0f;        //!< Scalar Value for a Randomized Pitch Offset
+    double mPitchScalar = 0.0f;       //!< Scalar Value for a Randomized Pitch Offset
 
     bool mIsFinished = true;          //!< Boolean for whether or not the Grain needs to be replayed.
   };

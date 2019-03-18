@@ -46,13 +46,15 @@ float GrainCloud::operator()(int channel)
     sample += (mAudioSourceBuffer->getSample(channel, 
                                             static_cast<int>(grain.mCurrentSample[channel])));
    
-    grain.mCurrentSample[channel] += static_cast<float>(grain.mPitchScalar);
-    if(grain.mCurrentSample[channel] >= static_cast<float>(mWaveSize))
-      grain.mCurrentSample[channel] = (static_cast<float>(mWaveSize) - 1.0f);
+    grain.mCurrentSample[channel] += grain.mPitchScalar;
+    if(grain.mCurrentSample[channel] >= static_cast<double>(mWaveSize))
+      grain.mCurrentSample[channel] = (static_cast<double>(mWaveSize) - 1.0f);
     
   }
 
-  sample *= 0.2f;
+  if(grains.size() > 1)
+    sample *= 0.3f;
+
   if(sample > 1.0f)
     return 1.0f;
   else if(sample < -1.0f)
@@ -140,8 +142,8 @@ void GrainCloud::RandomizeGrain(GrainData& grain)
   }
     
   // Set the Current Sample to the Starting Sample
-  grain.mCurrentSample[LEFT_CHANNEL] = static_cast<float>(grains.back().mStartingSample);
-  grain.mCurrentSample[RIGHT_CHANNEL] = static_cast<float>(grains.back().mStartingSample);
+  grain.mCurrentSample[LEFT_CHANNEL] = static_cast<double>(grains.back().mStartingSample);
+  grain.mCurrentSample[RIGHT_CHANNEL] = static_cast<double>(grains.back().mStartingSample);
 
   // Clamp the End Sample to be Within the WaveTable Range
   grain.mEndSample = grain.mStartingSample + mSampleDelta;

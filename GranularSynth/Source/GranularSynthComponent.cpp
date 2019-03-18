@@ -213,12 +213,12 @@ void GranularSynthComponent::openFile()
       mCentroidSampleSlider.setTextValueSuffix (" Sample");
       mCentroidSampleSlider.setNumDecimalPlacesToDisplay(0);
 
-      // Reset the Values for all Sliders
-      //mCentroidSampleSlider.setValue(1, dontSendNotification);
-      //mGrainDurationSlider.setValue(1, dontSendNotification);
-      //mStartingOffsetSlider.setValue(1, dontSendNotification);
-      //mCloudSizeSlider.setValue(0, dontSendNotification);
-      //mPitchOffsetSlider.setValue(0, dontSendNotification);
+      // Reset the Values for all Sliders 
+      mCentroidSampleSlider.setValue(1);
+      mGrainDurationSlider.setValue(1);
+      mStartingOffsetSlider.setValue(1);
+      mCloudSizeSlider.setValue(0);
+      mPitchOffsetSlider.setValue(0);
 
       // Turn Back on the Audio Thread
       setAudioChannels(0, reader->numChannels);

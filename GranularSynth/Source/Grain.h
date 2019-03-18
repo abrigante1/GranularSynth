@@ -107,6 +107,12 @@ public:
   //! Pitch Offset (in semitones)
   int mPitchOffset = 0;
 
+  //!< Gain Offset for a Individual Grain (in dB)
+  int mGainOffsetDb = 0;
+
+  //!< Scalar Value for the Global Gain of the Cloud (gain value)
+  double mGlobalGain = 1.0;   
+
 private:
   //================================VARIABLES=====================================
   
@@ -122,13 +128,16 @@ private:
    */
   struct GrainData
   {
-    double mCurrentSample[2] = { 0.0, 0.0 }; //!< Current Playing Sample of a Grain
-    int mStartingSample = 0;          //!< Actual Starting Sample for a Specific Grain
-    int mEndSample = 0;               //!< Ending Sample of a Grain
-    
-    double mPitchScalar = 0.0f;       //!< Scalar Value for a Randomized Pitch Offset
+    //! Current Playing Sample of a Grain
+    double mCurrentSample[2] = { 0.0, 0.0 }; 
 
-    bool mIsFinished = true;          //!< Boolean for whether or not the Grain needs to be replayed.
+    int mStartingSample = 0;     //!< Actual Starting Sample for a Specific Grain
+    int mEndSample = 0;          //!< Ending Sample of a Grain
+    
+    double mPitchScalar = 1.0f;  //!< Scalar Value for a Randomized Pitch Offset
+    double mGainScalar = 1.0f;   //!< Scalar Value for a Randomized Gain Offset (gain value)
+
+    bool mIsFinished = true;     //!< Boolean for whether or not the Grain needs to be replayed.
   };
 
   //! Vector Containing the Grains in the Grain Cloud
@@ -139,6 +148,7 @@ private:
   int mCentroidSample = 1;  //!< The Centroid Sample for a Grain Cloud
   int mDuration = 0;        //!< Duration (in ms) of a Grain Cloud
   int mSampleDelta = 0;     //!< Delta Between the Starting Sample and the Ending Sample (determined by Duration)
+
 
   int mWaveSize = 0;        //!< The Size of the Audio Waveform being used
   int mSamplingRate;        //!< Sampling Rate of the Audio used by the Grain Cloud

@@ -43,8 +43,8 @@ float GrainCloud::operator()(int channel)
     }
 
     // Get the Current Sample From the Audio Buffer
-    sample += (mAudioSourceBuffer->getSample(channel, 
-                                            static_cast<int>(grain.mCurrentSample[channel])));
+    float currentSample = (mAudioSourceBuffer->getSample(channel, static_cast<int>(grain.mCurrentSample[channel])));
+    sample += (currentSample * static_cast<float>(grain.mGainScalar));
    
     grain.mCurrentSample[channel] += grain.mPitchScalar;
     if(grain.mCurrentSample[channel] >= static_cast<double>(mWaveSize))
@@ -52,9 +52,14 @@ float GrainCloud::operator()(int channel)
     
   }
 
+  // Scale the Sample by the Gain
+  sample *= static_cast<float>(mGlobalGain);
+
+  // If Polyphonic, Scale by 0.3f
   if(grains.size() > 1)
     sample *= 0.3f;
-
+  
+  // Clip Check
   if(sample > 1.0f)
     return 1.0f;
   else if(sample < -1.0f)
@@ -142,8 +147,8 @@ void GrainCloud::RandomizeGrain(GrainData& grain)
   }
     
   // Set the Current Sample to the Starting Sample
-  grain.mCurrentSample[LEFT_CHANNEL] = static_cast<double>(grains.back().mStartingSample);
-  grain.mCurrentSample[RIGHT_CHANNEL] = static_cast<double>(grains.back().mStartingSample);
+  grain.mCurrentSample[LEFT_CHANNEL] = static_cast<double>(grain.mStartingSample);
+  grain.mCurrentSample[RIGHT_CHANNEL] = static_cast<double>(grain.mStartingSample);
 
   // Clamp the End Sample to be Within the WaveTable Range
   grain.mEndSample = grain.mStartingSample + mSampleDelta;
@@ -154,8 +159,13 @@ void GrainCloud::RandomizeGrain(GrainData& grain)
   int randomPitch = 0;
   if(mPitchOffset > 0)
     randomPitch = rand.nextInt(Range<int>(-mPitchOffset, mPitchOffset));
-
   grain.mPitchScalar = std::pow(2.0f, static_cast<double>(randomPitch) / 12.0f);
+
+  // Randomize the Grain Gain
+  double randomGain = 0.0;
+  if(mGainOffsetDb < 0)
+    randomGain = static_cast<double>(rand.nextInt(Range<int>(mGainOffsetDb, 0)));
+  grain.mGainScalar = Decibels::decibelsToGain<double>(randomGain);
 }
 
 // ------------------------------------------------------------------------------------

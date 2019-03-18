@@ -61,6 +61,8 @@ private:
     Slider mStartingOffsetSlider;  //<! Slider Designating the Offset a Grain can use.
     Slider mCloudSizeSlider;       //<! Slider Designating the Cloud Size of a Grain
     Slider mPitchOffsetSlider;     //<! Slider Designating the Random Pitch Offset of a Grain
+    Slider mGrainCloudGainSlider;  //<! Slider Designating the Gain for an Entire Cloud
+    Slider mGrainGainOffsetSlider; //<! Slider Designating the Random Gain Offset of a Grains
 
 
     //----- Data ------//

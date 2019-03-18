@@ -47,6 +47,20 @@ GranularSynthComponent::GranularSynthComponent() : activeGrain()
     mPitchOffsetSlider.addListener(this);
     addAndMakeVisible (mPitchOffsetSlider);
 
+    // Grain Cloud Gain Slider
+    mGrainCloudGainSlider.setRange (-60, 0);
+    mGrainCloudGainSlider.setTextValueSuffix (" dB");
+    mGrainCloudGainSlider.setNumDecimalPlacesToDisplay(0);
+    mGrainCloudGainSlider.addListener(this);
+    addAndMakeVisible (mGrainCloudGainSlider);
+
+    // Grain Gain Offset Slider
+    mGrainGainOffsetSlider.setRange (-60, 0);
+    mGrainGainOffsetSlider.setTextValueSuffix (" dB");
+    mGrainGainOffsetSlider.setNumDecimalPlacesToDisplay(0);
+    mGrainGainOffsetSlider.addListener(this);
+    addAndMakeVisible (mGrainGainOffsetSlider);
+
     // Open File Button
     mOpenFileButton.setButtonText("Open File...");
     mOpenFileButton.onClick = [this] { openFile(); };
@@ -125,16 +139,34 @@ void GranularSynthComponent::releaseResources()
 
 void GranularSynthComponent::sliderValueChanged(Slider * slider)
 {
+  // Centroid Sample
   if (slider == &mCentroidSampleSlider)
     activeGrain.SetCentroidSample(static_cast<int>(mCentroidSampleSlider.getValue()));
+
+  // Gain Duration
   else if (slider == &mGrainDurationSlider)
     activeGrain.SetDuration(static_cast<int>(mGrainDurationSlider.getValue()));
+
+  // Starting Offset
   else if (slider == &mStartingOffsetSlider)
     activeGrain.mStartingOffset = static_cast<int>(mStartingOffsetSlider.getValue());
+
+  // Cloud Size
   else if (slider == &mCloudSizeSlider)
     activeGrain.SetCloudSize(static_cast<int>(mCloudSizeSlider.getValue())); 
+
+  // Pitch Offset
   else if(slider == &mPitchOffsetSlider)
     activeGrain.mPitchOffset = static_cast<int>(mPitchOffsetSlider.getValue());
+
+  // Grain Cloud Gain
+  else if(slider == &mGrainCloudGainSlider)
+    activeGrain.mGlobalGain = Decibels::decibelsToGain<double>(mGrainCloudGainSlider.getValue());
+
+  // Grain Gain Offset
+  else if(slider == &mGrainGainOffsetSlider)
+    activeGrain.mGainOffsetDb = static_cast<int>(mGrainGainOffsetSlider.getValue());
+
 }
 
 //==============================================================================
@@ -147,6 +179,8 @@ void GranularSynthComponent::resized()
     mCloudSizeSlider.setBounds (100, (yValue += 30), getWidth() - 110, 20);
     mStartingOffsetSlider.setBounds (100, (yValue += 30), getWidth() - 110, 20);
     mPitchOffsetSlider.setBounds(100, (yValue += 30), getWidth() - 110, 20);
+    mGrainCloudGainSlider.setBounds(100, (yValue += 30), getWidth() - 110, 20);
+    mGrainGainOffsetSlider.setBounds(100, (yValue += 30), getWidth() - 110, 20);
 
     mOpenFileButton.setBounds (10, (yValue += 30), getWidth() - 20, 20);
     mPlayButton.setBounds (10, (yValue += 30), getWidth() - 20, 20);
@@ -216,9 +250,11 @@ void GranularSynthComponent::openFile()
       // Reset the Values for all Sliders 
       mCentroidSampleSlider.setValue(1);
       mGrainDurationSlider.setValue(1);
-      mStartingOffsetSlider.setValue(1);
-      mCloudSizeSlider.setValue(0);
+      mCloudSizeSlider.setValue(1);
+      mStartingOffsetSlider.setValue(0);
       mPitchOffsetSlider.setValue(0);
+      mGrainCloudGainSlider.setValue(0);
+      mGrainGainOffsetSlider.setValue(0);
 
       // Turn Back on the Audio Thread
       setAudioChannels(0, reader->numChannels);

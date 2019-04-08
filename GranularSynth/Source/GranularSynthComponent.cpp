@@ -61,6 +61,17 @@ GranularSynthComponent::GranularSynthComponent() : activeGrain()
     mGrainGainOffsetSlider.addListener(this);
     addAndMakeVisible (mGrainGainOffsetSlider);
 
+    // Release Value of the Grain ADSR
+    mGrainReleaseSlider.setRange(0, 100);
+    mGrainReleaseSlider.setTextValueSuffix( " ms");
+    mGrainReleaseSlider.setNumDecimalPlacesToDisplay(0);
+    mGrainReleaseSlider.addListener(this);
+    addAndMakeVisible (mGrainReleaseSlider);
+
+
+
+    // ----- FILE I/O ----- //
+
     // Open File Button
     mOpenFileButton.setButtonText("Open File...");
     mOpenFileButton.onClick = [this] { openFile(); };
@@ -166,6 +177,10 @@ void GranularSynthComponent::sliderValueChanged(Slider * slider)
   // Grain Gain Offset
   else if(slider == &mGrainGainOffsetSlider)
     activeGrain.mGainOffsetDb = static_cast<int>(mGrainGainOffsetSlider.getValue());
+
+  // Release Slider
+  else if(slider == &mGrainReleaseSlider)
+    activeGrain.mEnvelopeRelease = (mGrainReleaseSlider.getValue() / 1000.0);
 
 }
 

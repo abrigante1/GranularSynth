@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="XZIx9w" name="GranularSynth" projectType="guiapp" jucerVersion="5.4.1">
+<JUCERPROJECT id="XZIx9w" name="GranularSynth" projectType="guiapp" jucerVersion="5.4.3">
   <MAINGROUP id="NJ68FQ" name="GranularSynth">
     <GROUP id="{3519090E-BC7B-6B85-B0E9-F08EBFCA088E}" name="Source">
       <FILE id="Ea9e9H" name="Envelope.h" compile="0" resource="0" file="Source/Envelope.h"/>

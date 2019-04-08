@@ -112,6 +112,10 @@ public:
 
   //!< Scalar Value for the Global Gain of the Cloud (gain value)
   double mGlobalGain = 1.0;   
+  
+  //!< Scalar Value for the Release Duration of the ADSR (in ms)
+  double mEnvelopeRelease = 100.0;
+
 
 private:
   //================================VARIABLES=====================================
@@ -122,6 +126,7 @@ private:
 
   /**
    *\struct: GrainData
+   *\author: AnthonyBrigante
    *\brief:
       The GrainData Struct contains data about a specific grain inside
       a grain cloud. GrainData is used and managed by the GrainCloud class.
@@ -137,7 +142,10 @@ private:
     double mPitchScalar = 1.0f;  //!< Scalar Value for a Randomized Pitch Offset
     double mGainScalar = 1.0f;   //!< Scalar Value for a Randomized Gain Offset (gain value)
 
-    bool mIsFinished = true;     //!< Boolean for whether or not the Grain needs to be replayed.
+    bool mInRelease = true;     //!< Boolean for whether or not the Grain needs to be replayed.
+
+    juce::ADSR envelope;    //!< ADSR Envelope for a Grain
+
   };
 
   //! Vector Containing the Grains in the Grain Cloud
@@ -160,7 +168,7 @@ private:
   /**
    *\fn: RandomizeGrain
    *\brief: Randomizes a Grain
-   *\param: GrainData& grain - Grain to Randomize Start and End Sample
+   *\param: GrainData& grain - Grain Parameters to Randomize
    */
   void RandomizeGrain(GrainData& grain);
 

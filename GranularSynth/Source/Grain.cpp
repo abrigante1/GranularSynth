@@ -23,28 +23,36 @@ float GrainCloud::operator()(int channel)
 
   for (GrainData& grain : grains)
   {
-     // Check if we are finished getting the current grain
-    if (mAudioSourceBuffer->getNumChannels() >= 2)
+    // If the Current Grain Isn't Active, Randomize it and Play the Grain
+    if (!grain.envelope.isActive())
     {
-      if ((grain.mCurrentSample[LEFT_CHANNEL] >= grain.mEndSample) && 
-          (grain.mCurrentSample[RIGHT_CHANNEL] >= grain.mEndSample))
-        grain.mIsFinished = true;
-    }
-    else if((grain.mCurrentSample[LEFT_CHANNEL] >= grain.mEndSample))
-      grain.mIsFinished = true;
-
-      // Restart the grain if we are using it after finishing.
-    if (grain.mIsFinished)
-    {
-      grain.mIsFinished = false;
-
-      // Randomize the Grain
       RandomizeGrain(grain);
+      grain.envelope.noteOn();
+      grain.mInRelease = false;
+    }
+    else if(!grain.mInRelease)
+    {
+      // Check if we are finished getting the current grain
+      if (mAudioSourceBuffer->getNumChannels() >= 2) // Stereo 
+      {
+        
+        if ((grain.mCurrentSample[LEFT_CHANNEL] >= grain.mEndSample) &&
+          (grain.mCurrentSample[RIGHT_CHANNEL] >= grain.mEndSample))
+        {
+          grain.envelope.noteOff();
+          grain.mInRelease = true;
+        }
+      }
+      else if (grain.mCurrentSample[LEFT_CHANNEL] >= grain.mEndSample) // Mono
+      {
+        grain.envelope.noteOff();
+        grain.mInRelease = true;
+      }
     }
 
     // Get the Current Sample From the Audio Buffer
     float currentSample = (mAudioSourceBuffer->getSample(channel, static_cast<int>(grain.mCurrentSample[channel])));
-    sample += (currentSample * static_cast<float>(grain.mGainScalar));
+    sample += (currentSample * grain.envelope.getNextSample() * static_cast<float>(grain.mGainScalar));
    
     grain.mCurrentSample[channel] += grain.mPitchScalar;
     if(grain.mCurrentSample[channel] >= static_cast<double>(mWaveSize))
@@ -145,6 +153,9 @@ void GrainCloud::RandomizeGrain(GrainData& grain)
     else if(grain.mStartingSample >= mWaveSize)
       grain.mStartingSample = (mWaveSize - 1);
   }
+
+  // Set Grain Envelope Parameters
+  grain.envelope.setParameters({});
     
   // Set the Current Sample to the Starting Sample
   grain.mCurrentSample[LEFT_CHANNEL] = static_cast<double>(grain.mStartingSample);
@@ -197,7 +208,7 @@ void GrainCloud::RemoveGrains(int count)
 void GrainCloud::Reset()
 {
   for (GrainData& grain : grains)
-    grain.mIsFinished = true;
+    grain.mInRelease = true;
  
   mIsPlaying = false;
 }

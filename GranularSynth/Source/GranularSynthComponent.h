@@ -63,7 +63,8 @@ private:
     Slider mPitchOffsetSlider;     //<! Slider Designating the Random Pitch Offset of a Grain
     Slider mGrainCloudGainSlider;  //<! Slider Designating the Gain for an Entire Cloud
     Slider mGrainGainOffsetSlider; //<! Slider Designating the Random Gain Offset of a Grains
-
+    Slider mGrainReleaseSlider;    //<! Slider Designating The Release Value of the Grain ADSR
+   
 
     //----- Data ------//
 

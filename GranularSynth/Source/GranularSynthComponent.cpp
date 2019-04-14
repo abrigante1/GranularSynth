@@ -253,6 +253,9 @@ void GranularSynthComponent::changeState(TransportState newState)
 
 void GranularSynthComponent::openFile()
 {
+  // Set the Grain to No Longer be Playing
+  activeGrain.mIsPlaying = false;
+  
   // Close the Audio Thread While Opening A File
   shutdownAudio();
   

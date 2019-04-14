@@ -100,22 +100,27 @@ public:
 
   //! Boolean for if the Grain is currently being played
   bool mIsPlaying = false;
+
+   //! Boolean for Determining if we are Randomly Panning the Granular Synth
+  bool mRandomPanning = false;
   
   //! Offset of where a Grain can start from
   int mStartingOffset = 0; 
 
   //! Pitch Offset (in semitones)
-  int mPitchOffset = 0;
+  double mPitchOffset = 0.0;
 
-  //!< Gain Offset for a Individual Grain (in dB)
+  //! Pitch Offset Level is used to Properly Generate Random Doubles in the valid range.
+  double mPitchOffsetLevel = 0.0; 
+
+  //! Gain Offset for a Individual Grain (in dB)
   int mGainOffsetDb = 0;
 
-  //!< Scalar Value for the Global Gain of the Cloud (gain value)
+  //! Scalar Value for the Global Gain of the Cloud (gain value)
   double mGlobalGain = 1.0;   
   
-  //!< Scalar Value for the Release Duration of the ADSR (in ms)
+  //! Scalar Value for the Release Duration of the ADSR (in ms)
   double mEnvelopeRelease = 100.0;
-
 
 private:
   //================================VARIABLES=====================================
@@ -141,7 +146,8 @@ private:
     
     double mPitchScalar = 1.0f;  //!< Scalar Value for a Randomized Pitch Offset
     double mGainScalar = 1.0f;   //!< Scalar Value for a Randomized Gain Offset (gain value)
-
+    double mPanningValue = 1.0f; //!< Scalar Value for a Random Pan
+    
     bool mInRelease = true;     //!< Boolean for whether or not the Grain needs to be replayed.
 
     juce::ADSR envelope;    //!< ADSR Envelope for a Grain

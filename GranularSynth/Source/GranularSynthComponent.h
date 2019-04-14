@@ -43,6 +43,7 @@ public:
     void releaseResources() override;
 
     void sliderValueChanged(Slider* slider) override;
+    void updateToggleValue(Button* button);
 
     //==============================================================================
     void resized() override;
@@ -64,6 +65,7 @@ private:
     Slider mGrainCloudGainSlider;  //<! Slider Designating the Gain for an Entire Cloud
     Slider mGrainGainOffsetSlider; //<! Slider Designating the Random Gain Offset of a Grains
     Slider mGrainReleaseSlider;    //<! Slider Designating The Release Value of the Grain ADSR
+    ToggleButton mRandomPanning;   //<! ToggleButton Determining if we are to Randomly Pan the Grain
    
 
     //----- Data ------//

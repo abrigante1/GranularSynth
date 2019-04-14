@@ -43,7 +43,7 @@ GranularSynthComponent::GranularSynthComponent() : activeGrain()
     // Pitch Offset Slider
     mPitchOffsetSlider.setRange (0, 24);
     mPitchOffsetSlider.setTextValueSuffix (" semitones");
-    mPitchOffsetSlider.setNumDecimalPlacesToDisplay(0);
+    mPitchOffsetSlider.setNumDecimalPlacesToDisplay(2);
     mPitchOffsetSlider.addListener(this);
     addAndMakeVisible (mPitchOffsetSlider);
 
@@ -68,6 +68,10 @@ GranularSynthComponent::GranularSynthComponent() : activeGrain()
     mGrainReleaseSlider.addListener(this);
     addAndMakeVisible (mGrainReleaseSlider);
 
+    // Random Panning Boolean
+    addAndMakeVisible(mRandomPanning);
+    mRandomPanning.onClick = [this] { updateToggleValue(&mRandomPanning); };
+    mRandomPanning.setButtonText("Random Panning?");
 
 
     // ----- FILE I/O ----- //
@@ -167,8 +171,11 @@ void GranularSynthComponent::sliderValueChanged(Slider * slider)
     activeGrain.SetCloudSize(static_cast<int>(mCloudSizeSlider.getValue())); 
 
   // Pitch Offset
-  else if(slider == &mPitchOffsetSlider)
-    activeGrain.mPitchOffset = static_cast<int>(mPitchOffsetSlider.getValue());
+  else if (slider == &mPitchOffsetSlider)
+  {
+    activeGrain.mPitchOffset = mPitchOffsetSlider.getValue();
+    activeGrain.mPitchOffsetLevel = activeGrain.mPitchOffset * 2.0;
+  }
 
   // Grain Cloud Gain
   else if(slider == &mGrainCloudGainSlider)
@@ -184,6 +191,12 @@ void GranularSynthComponent::sliderValueChanged(Slider * slider)
 
 }
 
+void GranularSynthComponent::updateToggleValue(Button* button)
+{
+  if(button == &mRandomPanning)
+    activeGrain.mRandomPanning = button->getToggleState();
+}
+
 //==============================================================================
 
 void GranularSynthComponent::resized()
@@ -196,10 +209,13 @@ void GranularSynthComponent::resized()
     mPitchOffsetSlider.setBounds(100, (yValue += 30), getWidth() - 110, 20);
     mGrainCloudGainSlider.setBounds(100, (yValue += 30), getWidth() - 110, 20);
     mGrainGainOffsetSlider.setBounds(100, (yValue += 30), getWidth() - 110, 20);
+    mGrainReleaseSlider.setBounds(100, (yValue += 30), getWidth() - 110, 20);
+    mRandomPanning.setBounds(100, (yValue += 30), getWidth() - 110, 20);
 
     mOpenFileButton.setBounds (10, (yValue += 30), getWidth() - 20, 20);
     mPlayButton.setBounds (10, (yValue += 30), getWidth() - 20, 20);
     mStopButton.setBounds (10, (yValue += 30), getWidth() - 20, 20);
+
 }
 
 //==============================================================================

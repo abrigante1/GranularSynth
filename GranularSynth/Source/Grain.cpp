@@ -42,6 +42,7 @@ float GrainCloud::operator()(int channel)
           grain.envelope.noteOff();
           grain.mInRelease = true;
         }
+
       }
       else if (grain.mCurrentSample[LEFT_CHANNEL] >= grain.mEndSample) // Mono
       {
@@ -50,9 +51,18 @@ float GrainCloud::operator()(int channel)
       }
     }
 
+    double randomPanValue = 1.0f;
+    if(mRandomPanning)
+      if (channel == 0)
+        randomPanValue = std::sin(grain.mPanningValue * (M_PI_2));
+      else
+        randomPanValue = std::sin((1.0 - grain.mPanningValue) * (M_PI_2));
+
     // Get the Current Sample From the Audio Buffer
     float currentSample = (mAudioSourceBuffer->getSample(channel, static_cast<int>(grain.mCurrentSample[channel])));
-    sample += (currentSample * grain.envelope.getNextSample() * static_cast<float>(grain.mGainScalar));
+    
+    //         currentSample             ADSR Grain                         Random Gain                            Random Panning Value
+    sample += (currentSample * grain.envelope.getNextSample() * static_cast<float>(grain.mGainScalar) * static_cast<float>(randomPanValue));
    
     grain.mCurrentSample[channel] += grain.mPitchScalar;
     if(grain.mCurrentSample[channel] >= static_cast<double>(mWaveSize))
@@ -167,16 +177,22 @@ void GrainCloud::RandomizeGrain(GrainData& grain)
     grain.mEndSample = (mWaveSize - 1);
   
   // Randomize the Pitch 
-  int randomPitch = 0;
-  if(mPitchOffset > 0)
-    randomPitch = rand.nextInt(Range<int>(-mPitchOffset, mPitchOffset));
-  grain.mPitchScalar = std::pow(2.0f, static_cast<double>(randomPitch) / 12.0f);
+  double randomPitch = 0.0;
+  if(mPitchOffset > 0.0)
+    randomPitch = rand.nextDouble() * mPitchOffsetLevel - mPitchOffset;
+  grain.mPitchScalar = std::pow(2.0f, randomPitch / 12.0f);
 
   // Randomize the Grain Gain
   double randomGain = 0.0;
   if(mGainOffsetDb < 0)
     randomGain = static_cast<double>(rand.nextInt(Range<int>(mGainOffsetDb, 0)));
   grain.mGainScalar = Decibels::decibelsToGain<double>(randomGain);
+
+  // Randomize the Pan Value
+  if(mRandomPanning)
+    grain.mPanningValue = rand.nextDouble();
+  else
+    grain.mPanningValue = 1.0f;
 }
 
 // ------------------------------------------------------------------------------------
@@ -208,7 +224,10 @@ void GrainCloud::RemoveGrains(int count)
 void GrainCloud::Reset()
 {
   for (GrainData& grain : grains)
+  {
+    grain.envelope.noteOff();
     grain.mInRelease = true;
+  }
  
   mIsPlaying = false;
 }

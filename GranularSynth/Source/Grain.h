@@ -108,13 +108,15 @@ public:
   int mStartingOffset = 0; 
 
   //! Pitch Offset (in semitones)
-  double mPitchOffset = 0.0;
+  double mPitchOffsetMin = 0.0;
+  double mPitchOffsetMax = 0.0;
 
   //! Pitch Offset Level is used to Properly Generate Random Doubles in the valid range.
   double mPitchOffsetLevel = 0.0; 
 
   //! Gain Offset for a Individual Grain (in dB)
-  int mGainOffsetDb = 0;
+  int mGainOffsetDbMin = 0;
+  int mGainOffsetDbMax = 0;
 
   //! Scalar Value for the Global Gain of the Cloud (gain value)
   double mGlobalGain = 1.0;   

@@ -77,18 +77,31 @@ GranularSynthComponent::GranularSynthComponent() : activeGrain()
 
         //------ PITCH OFFSET -------//
 
-    // Label
-    addAndMakeVisible(mPitchOffsetLabel);
-    mPitchOffsetLabel.setText("Random Pitch Offset", dontSendNotification);
-    mPitchOffsetLabel.attachToComponent(&mPitchOffsetSlider, false);
-    mPitchOffsetLabel.setJustificationType(Justification::centred);
+    // Min Label
+    addAndMakeVisible(mPitchOffsetMinLabel);
+    mPitchOffsetMinLabel.setText("Minimum Pitch Offset", dontSendNotification);
+    mPitchOffsetMinLabel.attachToComponent(&mPitchOffsetMinSlider, false);
+    mPitchOffsetMinLabel.setJustificationType(Justification::centred);
 
-    // Slider
-    mPitchOffsetSlider.setRange (0, 24);
-    mPitchOffsetSlider.setTextValueSuffix (" semitones");
-    mPitchOffsetSlider.setNumDecimalPlacesToDisplay(2);
-    mPitchOffsetSlider.addListener(this);
-    addAndMakeVisible (mPitchOffsetSlider);
+    // Min Slider
+    mPitchOffsetMinSlider.setRange (-24, 24);
+    mPitchOffsetMinSlider.setTextValueSuffix (" semitones");
+    mPitchOffsetMinSlider.setNumDecimalPlacesToDisplay(2);
+    mPitchOffsetMinSlider.addListener(this);
+    addAndMakeVisible (mPitchOffsetMinSlider);
+
+    // Max Label
+    addAndMakeVisible(mPitchOffsetMaxLabel);
+    mPitchOffsetMaxLabel.setText("Maximum Pitch Offset", dontSendNotification);
+    mPitchOffsetMaxLabel.attachToComponent(&mPitchOffsetMaxSlider, false);
+    mPitchOffsetMaxLabel.setJustificationType(Justification::centred);
+
+    // Max Slider
+    mPitchOffsetMaxSlider.setRange (-24, 24);
+    mPitchOffsetMaxSlider.setTextValueSuffix (" semitones");
+    mPitchOffsetMaxSlider.setNumDecimalPlacesToDisplay(2);
+    mPitchOffsetMaxSlider.addListener(this);
+    addAndMakeVisible (mPitchOffsetMaxSlider);
 
         //------ GLOBAL GAIN -------//
 
@@ -107,18 +120,32 @@ GranularSynthComponent::GranularSynthComponent() : activeGrain()
 
         //------ GRAIN GAIN OFFSET -------//
 
-    // Label
-    addAndMakeVisible(mGrainGainLabel);
-    mGrainGainLabel.setText("Random Grain Gain Offset", dontSendNotification);
-    mGrainGainLabel.attachToComponent(&mGrainGainOffsetSlider, false);
-    mGrainGainLabel.setJustificationType(Justification::centred);
 
-    // Slider
-    mGrainGainOffsetSlider.setRange (-60, 0);
-    mGrainGainOffsetSlider.setTextValueSuffix (" dB");
-    mGrainGainOffsetSlider.setNumDecimalPlacesToDisplay(0);
-    mGrainGainOffsetSlider.addListener(this);
-    addAndMakeVisible (mGrainGainOffsetSlider);
+    // Min Label
+    addAndMakeVisible(mGrainGainMinLabel);
+    mGrainGainMinLabel.setText("Grain Gain Minimum", dontSendNotification);
+    mGrainGainMinLabel.attachToComponent(&mGrainGainMinSlider, false);
+    mGrainGainMinLabel.setJustificationType(Justification::centred);
+
+    // Min Slider
+    mGrainGainMinSlider.setRange (-60, 0);
+    mGrainGainMinSlider.setTextValueSuffix (" dB");
+    mGrainGainMinSlider.setNumDecimalPlacesToDisplay(0);
+    mGrainGainMinSlider.addListener(this);
+    addAndMakeVisible (mGrainGainMinSlider);
+
+    // Max Label
+    addAndMakeVisible(mGrainGainMaxLabel);
+    mGrainGainMaxLabel.setText("Grain Gain Maximum", dontSendNotification);
+    mGrainGainMaxLabel.attachToComponent(&mGrainGainMaxSlider, false);
+    mGrainGainMaxLabel.setJustificationType(Justification::centred);
+
+    // Max Slider
+    mGrainGainMaxSlider.setRange (-60, 0);
+    mGrainGainMaxSlider.setTextValueSuffix (" dB");
+    mGrainGainMaxSlider.setNumDecimalPlacesToDisplay(0);
+    mGrainGainMaxSlider.addListener(this);
+    addAndMakeVisible (mGrainGainMaxSlider);
 
     // Release Value of the Grain ADSR
     /*mGrainReleaseSlider.setRange(0, 100);
@@ -229,20 +256,25 @@ void GranularSynthComponent::sliderValueChanged(Slider * slider)
   else if (slider == &mCloudSizeSlider)
     activeGrain.SetCloudSize(static_cast<int>(mCloudSizeSlider.getValue())); 
 
-  // Pitch Offset
-  else if (slider == &mPitchOffsetSlider)
-  {
-    activeGrain.mPitchOffset = mPitchOffsetSlider.getValue();
-    activeGrain.mPitchOffsetLevel = activeGrain.mPitchOffset * 2.0;
-  }
+  // Pitch Offset Min
+  else if (slider == &mPitchOffsetMinSlider)
+    activeGrain.mPitchOffsetMin = mPitchOffsetMinSlider.getValue();
 
+  // Pitch Offset Max
+  else if (slider == &mPitchOffsetMaxSlider)
+    activeGrain.mPitchOffsetMax = mPitchOffsetMaxSlider.getValue();
+  
   // Grain Cloud Gain
   else if(slider == &mGrainCloudGainSlider)
     activeGrain.mGlobalGain = Decibels::decibelsToGain<double>(mGrainCloudGainSlider.getValue());
+  
+  // Grain Gain Min Offset
+  else if(slider == &mGrainGainMinSlider)
+    activeGrain.mGainOffsetDbMin = static_cast<int>(mGrainGainMinSlider.getValue());
 
-  // Grain Gain Offset
-  else if(slider == &mGrainGainOffsetSlider)
-    activeGrain.mGainOffsetDb = static_cast<int>(mGrainGainOffsetSlider.getValue());
+  // Grain Gain Max Offset
+  else if(slider == &mGrainGainMaxSlider)
+    activeGrain.mGainOffsetDbMax = static_cast<int>(mGrainGainMaxSlider.getValue());
 
   // Release Slider
   else if(slider == &mGrainReleaseSlider)
@@ -262,16 +294,36 @@ void GranularSynthComponent::resized()
 {
     int yValue = 30;
     int yValueOffset = 50;
-    mCentroidSampleSlider.setBounds (100, (yValue), getWidth() - 110, 20);
-    mGrainDurationSlider.setBounds  (100, (yValue += yValueOffset), getWidth() - 110, 20);
-    mCloudSizeSlider.setBounds      (100, (yValue += yValueOffset), getWidth() - 110, 20);
-    mStartingOffsetSlider.setBounds (100, (yValue += yValueOffset), getWidth() - 110, 20);
-    mPitchOffsetSlider.setBounds    (100, (yValue += yValueOffset), getWidth() - 110, 20);
-    mGrainCloudGainSlider.setBounds (100, (yValue += yValueOffset), getWidth() - 110, 20);
-    mGrainGainOffsetSlider.setBounds(100, (yValue += yValueOffset), getWidth() - 110, 20);
-    mGrainReleaseSlider.setBounds   (100, (yValue += yValueOffset), getWidth() - 110, 20);
-    mRandomPanning.setBounds        (100, (yValue += 10), getWidth() - 110, 20);
+    auto xValue = 50;
+    auto halfWidth = (getWidth() / 2) - 30;
+    
+    // Centroid Sample
+    mCentroidSampleSlider.setBounds (xValue, (yValue), getWidth() - xValue - 10, 20);
+    
+    // Grain Duration
+    mGrainDurationSlider.setBounds  (xValue, (yValue += yValueOffset), getWidth() - xValue - 10, 20);
+    
+    // Cloud Size
+    mCloudSizeSlider.setBounds      (xValue, (yValue += yValueOffset), getWidth() - xValue - 10, 20);
+    
+    // Offset
+    mStartingOffsetSlider.setBounds (xValue, (yValue += yValueOffset), getWidth() - xValue - 10, 20);
+    
+    // Pitch Offset
+    mPitchOffsetMinSlider.setBounds (xValue, (yValue += yValueOffset), halfWidth, 20);
+    mPitchOffsetMaxSlider.setBounds (mPitchOffsetMinSlider.getRight(), yValue, halfWidth, 20);
+    
+    // Grain Cloud
+    mGrainCloudGainSlider.setBounds (xValue, (yValue += yValueOffset), getWidth() - xValue - 10, 20);
 
+    // Grain Gain
+    mGrainGainMinSlider.setBounds   (xValue, (yValue += yValueOffset), halfWidth, 20);
+    mGrainGainMaxSlider.setBounds   (mGrainGainMinSlider.getRight(), yValue, halfWidth, 20);
+   
+    // Random Panning
+    mRandomPanning.setBounds        (xValue, (yValue += yValueOffset),getWidth() - xValue - 10, 20);
+
+    // Buttons
     mOpenFileButton.setBounds (10, (yValue += 40), getWidth() - 20, 20);
     mPlayButton.setBounds (10, (yValue += 30), getWidth() - 20, 20);
     mStopButton.setBounds (10, (yValue += 30), getWidth() - 20, 20);
@@ -346,9 +398,11 @@ void GranularSynthComponent::openFile()
       mGrainDurationSlider.setValue(1);
       mCloudSizeSlider.setValue(1);
       mStartingOffsetSlider.setValue(0);
-      mPitchOffsetSlider.setValue(0);
+      mPitchOffsetMinSlider.setValue(0);
+      mPitchOffsetMaxSlider.setValue(0);
       mGrainCloudGainSlider.setValue(0);
-      mGrainGainOffsetSlider.setValue(0);
+      mGrainGainMinSlider.setValue(0);
+      mGrainGainMaxSlider.setValue(0);
 
       // Turn Back on the Audio Thread
       setAudioChannels(0, reader->numChannels);

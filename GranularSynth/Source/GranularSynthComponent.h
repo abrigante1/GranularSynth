@@ -69,14 +69,29 @@ private:
     Label mCloudSizeLabel;         //<! Label Noting the Cloud Size Slider
     Slider mCloudSizeSlider;       //<! Slider Designating the Cloud Size of a Grain
 
+    // --- Pitch Offset --- //
     Label mPitchOffsetLabel;       //<! Label Noting the Pitch Offset Sliders
-    Slider mPitchOffsetSlider;     //<! Slider Designating the Random Pitch Offset of a Grain
     
+    Label mPitchOffsetMinLabel;    //<! Label Noting the Pitch Offset Min Slider
+    Slider mPitchOffsetMinSlider;  //<! Slider Designating the Minimum Pitch Offset Value
+    
+    Label mPitchOffsetMaxLabel;    //<! Label Noting the Pitch Offset Max Slider
+    Slider mPitchOffsetMaxSlider;  //<! Slider Designating the Maximium Pitch Offset Value
+    
+    // --- Global Gain --- //
+
     Label mGlobalGainLabel;        //<! Label Noting the Global Gain
     Slider mGrainCloudGainSlider;  //<! Slider Designating the Gain for an Entire Cloud
 
-    Label mGrainGainLabel;         //<! Label Noting the Grain Gain Offset
-    Slider mGrainGainOffsetSlider; //<! Slider Designating the Random Gain Offset of a Grains
+    // --- Random Gain Offset --- //
+
+    Label mGrainGainMinLabel;      //<! Label Noting the Min Grain Gain Slider
+    Slider mGrainGainMinSlider;    //<! Slider Noting the Min Grain Gain Offset
+
+    Label mGrainGainMaxLabel;      //<! Label Noting the Max Grain Gain Slider
+    Slider mGrainGainMaxSlider;    //<! Slider Noting the Min Grain Gain Offset
+
+    // --- MISC --- //
 
     Slider mGrainReleaseSlider;    //<! Slider Designating The Release Value of the Grain ADSR
     ToggleButton mRandomPanning;   //<! ToggleButton Determining if we are to Randomly Pan the Grain

@@ -178,14 +178,14 @@ void GrainCloud::RandomizeGrain(GrainData& grain)
   
   // Randomize the Pitch 
   double randomPitch = 0.0;
-  if(mPitchOffset > 0.0)
-    randomPitch = rand.nextDouble() * mPitchOffsetLevel - mPitchOffset;
+  if(mPitchOffsetMax != 0.0 || mPitchOffsetMin != 0.0)
+    randomPitch = mPitchOffsetMin + (mPitchOffsetMax - mPitchOffsetMin) * rand.nextDouble();
   grain.mPitchScalar = std::pow(2.0f, randomPitch / 12.0f);
 
   // Randomize the Grain Gain
   double randomGain = 0.0;
-  if(mGainOffsetDb < 0)
-    randomGain = static_cast<double>(rand.nextInt(Range<int>(mGainOffsetDb, 0)));
+  if(mGainOffsetDbMax < 0)
+    randomGain = static_cast<double>(rand.nextInt(Range<int>(mGainOffsetDbMin, mGainOffsetDbMax)));
   grain.mGainScalar = Decibels::decibelsToGain<double>(randomGain);
 
   // Randomize the Pan Value

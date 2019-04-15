@@ -6,55 +6,114 @@
   ==============================================================================
 */
 
+// async vs sync granular synthesis
+
 #include "GranularSynthComponent.h"
 #include "Grain.h"
 
 //==============================================================================
 GranularSynthComponent::GranularSynthComponent() : activeGrain()
 {
-    // Centroid Sample Slider Setup
+
+        //------ CENTROID SAMPLE -------//
+    
+    // Label
+    addAndMakeVisible(mCentroidSampleLabel);
+    mCentroidSampleLabel.setText("Centroid Sample Location", dontSendNotification);
+    mCentroidSampleLabel.attachToComponent(&mCentroidSampleSlider, false);
+    mCentroidSampleLabel.setJustificationType(Justification::centred);
+
+    // Slider
     mCentroidSampleSlider.setRange (1, 2);
     mCentroidSampleSlider.setTextValueSuffix (" Sample");
     mCentroidSampleSlider.setNumDecimalPlacesToDisplay(0);
     mCentroidSampleSlider.addListener(this);
     addAndMakeVisible (mCentroidSampleSlider);
   
-    // Gain Duration Slider Setup
+        //------ GRAIN DURATION -------//
+
+    // Label
+    addAndMakeVisible(mGrainDurationLabel);
+    mGrainDurationLabel.setText("Grain Duration", dontSendNotification);
+    mGrainDurationLabel.attachToComponent(&mGrainDurationSlider, false);
+    mGrainDurationLabel.setJustificationType(Justification::centred);
+
+    // Slider
     mGrainDurationSlider.setRange (1, 1000);
     mGrainDurationSlider.setTextValueSuffix (" ms");
     mGrainDurationSlider.setNumDecimalPlacesToDisplay(0);
     mGrainDurationSlider.addListener(this);
     addAndMakeVisible (mGrainDurationSlider);
 
-    // Cloud Size Slider Setup
+        //------ CLOUD SIZE -------//
+
+    // Label
+    addAndMakeVisible(mCloudSizeLabel);
+    mCloudSizeLabel.setText("Cloud Size", dontSendNotification);
+    mCloudSizeLabel.attachToComponent(&mCloudSizeSlider, false);
+    mCloudSizeLabel.setJustificationType(Justification::centred);
+
+    // Slider
     mCloudSizeSlider.setRange (1, 10);
     mCloudSizeSlider.setTextValueSuffix (" grains");
     mCloudSizeSlider.setNumDecimalPlacesToDisplay(0);
     mCloudSizeSlider.addListener(this);
     addAndMakeVisible (mCloudSizeSlider);
 
-    // Starting Offset Slider Setup
+        //------ STARTING OFFSET -------//
+
+    // Label
+    addAndMakeVisible(mStartingOffsetLabel);
+    mStartingOffsetLabel.setText("Random Sample Offset", dontSendNotification);
+    mStartingOffsetLabel.attachToComponent(&mStartingOffsetSlider, false);
+    mStartingOffsetLabel.setJustificationType(Justification::centred);
+
+    // Slider
     mStartingOffsetSlider.setRange (0, 10000);
     mStartingOffsetSlider.setTextValueSuffix (" samples");
     mStartingOffsetSlider.setNumDecimalPlacesToDisplay(0);
     mStartingOffsetSlider.addListener(this);
     addAndMakeVisible (mStartingOffsetSlider);
 
-    // Pitch Offset Slider
+        //------ PITCH OFFSET -------//
+
+    // Label
+    addAndMakeVisible(mPitchOffsetLabel);
+    mPitchOffsetLabel.setText("Random Pitch Offset", dontSendNotification);
+    mPitchOffsetLabel.attachToComponent(&mPitchOffsetSlider, false);
+    mPitchOffsetLabel.setJustificationType(Justification::centred);
+
+    // Slider
     mPitchOffsetSlider.setRange (0, 24);
     mPitchOffsetSlider.setTextValueSuffix (" semitones");
     mPitchOffsetSlider.setNumDecimalPlacesToDisplay(2);
     mPitchOffsetSlider.addListener(this);
     addAndMakeVisible (mPitchOffsetSlider);
 
-    // Grain Cloud Gain Slider
+        //------ GLOBAL GAIN -------//
+
+    // Label
+    addAndMakeVisible(mGlobalGainLabel);
+    mGlobalGainLabel.setText("Global Gain", dontSendNotification);
+    mGlobalGainLabel.attachToComponent(&mGrainCloudGainSlider, false);
+    mGlobalGainLabel.setJustificationType(Justification::centred);
+
+    // Slider
     mGrainCloudGainSlider.setRange (-60, 0);
     mGrainCloudGainSlider.setTextValueSuffix (" dB");
     mGrainCloudGainSlider.setNumDecimalPlacesToDisplay(0);
     mGrainCloudGainSlider.addListener(this);
     addAndMakeVisible (mGrainCloudGainSlider);
 
-    // Grain Gain Offset Slider
+        //------ GRAIN GAIN OFFSET -------//
+
+    // Label
+    addAndMakeVisible(mGrainGainLabel);
+    mGrainGainLabel.setText("Random Grain Gain Offset", dontSendNotification);
+    mGrainGainLabel.attachToComponent(&mGrainGainOffsetSlider, false);
+    mGrainGainLabel.setJustificationType(Justification::centred);
+
+    // Slider
     mGrainGainOffsetSlider.setRange (-60, 0);
     mGrainGainOffsetSlider.setTextValueSuffix (" dB");
     mGrainGainOffsetSlider.setNumDecimalPlacesToDisplay(0);
@@ -62,11 +121,11 @@ GranularSynthComponent::GranularSynthComponent() : activeGrain()
     addAndMakeVisible (mGrainGainOffsetSlider);
 
     // Release Value of the Grain ADSR
-    mGrainReleaseSlider.setRange(0, 100);
+    /*mGrainReleaseSlider.setRange(0, 100);
     mGrainReleaseSlider.setTextValueSuffix( " ms");
     mGrainReleaseSlider.setNumDecimalPlacesToDisplay(0);
     mGrainReleaseSlider.addListener(this);
-    addAndMakeVisible (mGrainReleaseSlider);
+    addAndMakeVisible (mGrainReleaseSlider);*/
 
     // Random Panning Boolean
     addAndMakeVisible(mRandomPanning);
@@ -201,18 +260,19 @@ void GranularSynthComponent::updateToggleValue(Button* button)
 
 void GranularSynthComponent::resized()
 {
-    int yValue = 10;
+    int yValue = 30;
+    int yValueOffset = 50;
     mCentroidSampleSlider.setBounds (100, (yValue), getWidth() - 110, 20);
-    mGrainDurationSlider.setBounds (100,  (yValue += 30), getWidth() - 110, 20);
-    mCloudSizeSlider.setBounds (100, (yValue += 30), getWidth() - 110, 20);
-    mStartingOffsetSlider.setBounds (100, (yValue += 30), getWidth() - 110, 20);
-    mPitchOffsetSlider.setBounds(100, (yValue += 30), getWidth() - 110, 20);
-    mGrainCloudGainSlider.setBounds(100, (yValue += 30), getWidth() - 110, 20);
-    mGrainGainOffsetSlider.setBounds(100, (yValue += 30), getWidth() - 110, 20);
-    mGrainReleaseSlider.setBounds(100, (yValue += 30), getWidth() - 110, 20);
-    mRandomPanning.setBounds(100, (yValue += 30), getWidth() - 110, 20);
+    mGrainDurationSlider.setBounds  (100, (yValue += yValueOffset), getWidth() - 110, 20);
+    mCloudSizeSlider.setBounds      (100, (yValue += yValueOffset), getWidth() - 110, 20);
+    mStartingOffsetSlider.setBounds (100, (yValue += yValueOffset), getWidth() - 110, 20);
+    mPitchOffsetSlider.setBounds    (100, (yValue += yValueOffset), getWidth() - 110, 20);
+    mGrainCloudGainSlider.setBounds (100, (yValue += yValueOffset), getWidth() - 110, 20);
+    mGrainGainOffsetSlider.setBounds(100, (yValue += yValueOffset), getWidth() - 110, 20);
+    mGrainReleaseSlider.setBounds   (100, (yValue += yValueOffset), getWidth() - 110, 20);
+    mRandomPanning.setBounds        (100, (yValue += 10), getWidth() - 110, 20);
 
-    mOpenFileButton.setBounds (10, (yValue += 30), getWidth() - 20, 20);
+    mOpenFileButton.setBounds (10, (yValue += 40), getWidth() - 20, 20);
     mPlayButton.setBounds (10, (yValue += 30), getWidth() - 20, 20);
     mStopButton.setBounds (10, (yValue += 30), getWidth() - 20, 20);
 

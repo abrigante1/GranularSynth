@@ -57,13 +57,27 @@ private:
     TextButton mPlayButton;        //<! Button Used to Play an opened Audio File
     TextButton mStopButton;        //<! Button Used to Stop an Opened Audio File
 
+    Label mCentroidSampleLabel;    //<! Label Noting the Centroid Sample Slider
     Slider mCentroidSampleSlider;  //<! Slider Designating the Starting Sample of a Grain
+    
+    Label mGrainDurationLabel;     //<! Label Noting the Duration Slider
     Slider mGrainDurationSlider;   //<! Slider Designating the Duration of a Grain
+    
+    Label mStartingOffsetLabel;    //<! Label Noting the Starting Offset Slider
     Slider mStartingOffsetSlider;  //<! Slider Designating the Offset a Grain can use.
+
+    Label mCloudSizeLabel;         //<! Label Noting the Cloud Size Slider
     Slider mCloudSizeSlider;       //<! Slider Designating the Cloud Size of a Grain
+
+    Label mPitchOffsetLabel;       //<! Label Noting the Pitch Offset Sliders
     Slider mPitchOffsetSlider;     //<! Slider Designating the Random Pitch Offset of a Grain
+    
+    Label mGlobalGainLabel;        //<! Label Noting the Global Gain
     Slider mGrainCloudGainSlider;  //<! Slider Designating the Gain for an Entire Cloud
+
+    Label mGrainGainLabel;         //<! Label Noting the Grain Gain Offset
     Slider mGrainGainOffsetSlider; //<! Slider Designating the Random Gain Offset of a Grains
+
     Slider mGrainReleaseSlider;    //<! Slider Designating The Release Value of the Grain ADSR
     ToggleButton mRandomPanning;   //<! ToggleButton Determining if we are to Randomly Pan the Grain
    

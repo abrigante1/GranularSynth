@@ -12,8 +12,15 @@
 #include "Grain.h"
 
 //==============================================================================
-GranularSynthComponent::GranularSynthComponent() : activeGrain()
+GranularSynthComponent::GranularSynthComponent() 
+  : activeGrain(),
+    mThumbnailCache(5),
+    mThumbnail(512, mFormatManager, mThumbnailCache)
 {
+
+    // set size of the component
+    setSize (800, 700);
+
 
         //------ CENTROID SAMPLE -------//
     
@@ -181,11 +188,12 @@ GranularSynthComponent::GranularSynthComponent() : activeGrain()
     mStopButton.setEnabled(false);
     addAndMakeVisible(&mStopButton);
 
-    // set size of the component
-    setSize (800, 600);
-
     // Register the Audio File Reader
     mFormatManager.registerBasicFormats();
+
+    // Register the Change Listener with the AudioThumbnail
+    mThumbnail.addChangeListener(this);
+    
 
     // specify the number of input and output channels that we want to open
     setAudioChannels (0, 2);
@@ -282,6 +290,12 @@ void GranularSynthComponent::sliderValueChanged(Slider * slider)
 
 }
 
+void GranularSynthComponent::changeListenerCallback(ChangeBroadcaster* source)
+{
+  if(source == &mThumbnail)
+    repaint();
+}
+
 void GranularSynthComponent::updateToggleValue(Button* button)
 {
   if(button == &mRandomPanning)
@@ -325,9 +339,45 @@ void GranularSynthComponent::resized()
 
     // Buttons
     mOpenFileButton.setBounds (10, (yValue += 40), getWidth() - 20, 20);
-    mPlayButton.setBounds (10, (yValue += 30), getWidth() - 20, 20);
-    mStopButton.setBounds (10, (yValue += 30), getWidth() - 20, 20);
+    mPlayButton.setBounds (10, (yValue += 30), halfWidth + 20, 20);
+    mStopButton.setBounds (mPlayButton.getRight(), yValue, halfWidth + 20, 20);
 
+    mMaxYValue = (yValue + 50);
+
+}
+
+void GranularSynthComponent::paint(Graphics& g)
+{
+  // Only Draw Waveform if the Window is Big Enough
+  if (getHeight() >= 700)
+  {
+    Rectangle<int> thumbnailBounds(20, mMaxYValue, getWidth() - 40, (getHeight() / 4));
+
+    // Check if a file has been loaded and draw wavefrom if necessary
+    if (mThumbnail.getNumChannels() == 0) // if no wavefrom
+    {
+      g.setColour(Colours::darkgrey);
+      g.fillRect(thumbnailBounds);
+      g.setColour(Colours::white);
+      g.drawFittedText("No File Loaded", thumbnailBounds, Justification::centred, 1);
+    }
+    else // if waveform
+    {
+      g.setColour(Colours::transparentBlack);
+      g.fillRect(thumbnailBounds);
+      g.setColour(Colours::aquamarine);
+
+      double audioLength = mThumbnail.getTotalLength();
+      mThumbnail.drawChannels(g,
+        thumbnailBounds,
+        0.0,
+        audioLength,
+        1.0f);
+
+     // auto audioPosition = (activeGrain.GetCentroidSample();
+
+    }
+  }
 }
 
 //==============================================================================
@@ -384,6 +434,9 @@ void GranularSynthComponent::openFile()
     {
       // Enable the PlayButton
       mPlayButton.setEnabled(true);
+
+      // Set the Thumbnail's Source to the new wavefile
+      mThumbnail.setSource(new FileInputSource(file));
 
       // Set the Active Grain's Source Audio File to the New Source
       activeGrain.SetAudioSource(*reader);

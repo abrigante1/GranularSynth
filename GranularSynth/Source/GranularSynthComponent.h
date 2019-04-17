@@ -20,7 +20,8 @@
     The GranularSynthComponent is the Core Class that Manages the Entire GranularSynth
  */
 class GranularSynthComponent   : public AudioAppComponent,
-                                 public Slider::Listener 
+                                 public Slider::Listener,
+                                 public ChangeListener
 { 
 public:
     //==============================================================================
@@ -43,10 +44,12 @@ public:
     void releaseResources() override;
 
     void sliderValueChanged(Slider* slider) override;
+    void changeListenerCallback(ChangeBroadcaster* source) override;
     void updateToggleValue(Button* button);
 
     //==============================================================================
     void resized() override;
+    void paint(Graphics& g) override;
 
 private:
     //================================VARIABLES=====================================
@@ -91,11 +94,10 @@ private:
     Label mGrainGainMaxLabel;      //<! Label Noting the Max Grain Gain Slider
     Slider mGrainGainMaxSlider;    //<! Slider Noting the Min Grain Gain Offset
 
-    // --- MISC --- //
+    // --- Misc Grain Data Parameters --- //
 
     Slider mGrainReleaseSlider;    //<! Slider Designating The Release Value of the Grain ADSR
     ToggleButton mRandomPanning;   //<! ToggleButton Determining if we are to Randomly Pan the Grain
-   
 
     //----- Data ------//
 
@@ -116,6 +118,13 @@ private:
 
     std::vector<GrainCloud> mGrains;   //<! Vector of Grains 
     GrainCloud activeGrain;            //<! Reference to the Current Active grain. 
+
+    int mMaxYValue = 0; //<! Maximum Y value of Components being Drawn to the Screen
+
+    // --- Waveform GUI Drawing --- //
+    
+    AudioThumbnailCache mThumbnailCache; //<! Drawing Cache for the Waveform
+    AudioThumbnail mThumbnail;           //<! Waveform Thumbnail Object
 
     //================================FUNCTIONS=====================================
      

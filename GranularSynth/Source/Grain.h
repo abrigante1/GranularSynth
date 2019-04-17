@@ -31,14 +31,14 @@ class GrainCloud
 public:
 
   /**
-	 *\Grain constructor
-	 *\brief: Generates a Grain from a waveform generator
-   *\param: int StartingSample - Sample to Start the Grain 
+   *\Grain constructor
+   *\brief: Generates a Grain from a waveform generator
+   *\param: int StartingSample - Sample to Start the Grain
    *\param: int Duration - Duration of the Grain
-	 */
+   */
   GrainCloud(int startingSample_ = 1, int duration = 0);
 
-  /** 
+  /**
    *\Grain () operator
    *\brief: Plays a sample of the Grains (from WAV form)
    *\param: int channel - Channel of an Audio Buffer to Play Sample From
@@ -52,6 +52,13 @@ public:
    *\param: int startingSample - Sample to Start the Grain
    */
   void SetCentroidSample(int startingSample);
+
+  /*
+   *\fn: GetStartingSample
+   *\brief: Gets the Starting Sample of a Grain
+   *\return: int - Sample where the grain starts
+   */
+  int GetCentroidSample() { return mCentroidSample; }
 
   /**
    *\fn: SetDuration
@@ -195,5 +202,3 @@ private:
   void RemoveGrains(int count = 1);
 
 };
-
-

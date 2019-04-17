@@ -274,23 +274,47 @@ void GranularSynthComponent::sliderValueChanged(Slider * slider)
 
   // Pitch Offset Min
   else if (slider == &mPitchOffsetMinSlider)
+  {
+    // Cap the Minimum Slider to be Less/Equal then the Max Slider
+    if(mPitchOffsetMinSlider.getValue() > mPitchOffsetMaxSlider.getValue())
+      mPitchOffsetMinSlider.setValue(mPitchOffsetMaxSlider.getValue(), juce::dontSendNotification);
+
     activeGrain.mPitchOffsetMin = mPitchOffsetMinSlider.getValue();
+  }
 
   // Pitch Offset Max
   else if (slider == &mPitchOffsetMaxSlider)
+  {
+    // Cap the Maximum Slider to be Greater/Equal then the Max Slider
+    if(mPitchOffsetMinSlider.getValue() > mPitchOffsetMaxSlider.getValue())
+      mPitchOffsetMaxSlider.setValue(mPitchOffsetMinSlider.getValue(), juce::dontSendNotification);
+
     activeGrain.mPitchOffsetMax = mPitchOffsetMaxSlider.getValue();
+  }
   
   // Grain Cloud Gain
   else if(slider == &mGrainCloudGainSlider)
     activeGrain.mGlobalGain = Decibels::decibelsToGain<double>(mGrainCloudGainSlider.getValue());
   
   // Grain Gain Min Offset
-  else if(slider == &mGrainGainMinSlider)
+  else if (slider == &mGrainGainMinSlider)
+  {
+    // Cap the Maximum Slider to be Greater then the Max Slider
+    if(mGrainGainMinSlider.getValue() > mGrainGainMaxSlider.getValue())
+      mGrainGainMinSlider.setValue(mGrainGainMaxSlider.getValue(), juce::dontSendNotification);
+
     activeGrain.mGainOffsetDbMin = static_cast<int>(mGrainGainMinSlider.getValue());
+  }
 
   // Grain Gain Max Offset
-  else if(slider == &mGrainGainMaxSlider)
+  else if (slider == &mGrainGainMaxSlider)
+  {
+   // Cap the Maximum Slider to be Greater then the Max Slider
+    if(mGrainGainMinSlider.getValue() > mGrainGainMaxSlider.getValue())
+      mGrainGainMaxSlider.setValue(mGrainGainMinSlider.getValue(), juce::dontSendNotification);
+
     activeGrain.mGainOffsetDbMax = static_cast<int>(mGrainGainMaxSlider.getValue());
+  }
 
   // Release Slider
   else if(slider == &mGrainReleaseSlider)

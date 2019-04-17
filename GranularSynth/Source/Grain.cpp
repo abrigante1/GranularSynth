@@ -184,8 +184,11 @@ void GrainCloud::RandomizeGrain(GrainData& grain)
 
   // Randomize the Grain Gain
   double randomGain = 0.0;
-  if(mGainOffsetDbMax < 0)
+  if(mGainOffsetDbMin < 0 && (mGainOffsetDbMin != mGainOffsetDbMax))
     randomGain = static_cast<double>(rand.nextInt(Range<int>(mGainOffsetDbMin, mGainOffsetDbMax)));
+  else if(mGainOffsetDbMin == mGainOffsetDbMax)
+    randomGain = mGainOffsetDbMax;
+
   grain.mGainScalar = Decibels::decibelsToGain<double>(randomGain);
 
   // Randomize the Pan Value

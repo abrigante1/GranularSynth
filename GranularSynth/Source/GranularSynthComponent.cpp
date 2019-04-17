@@ -264,13 +264,14 @@ void GranularSynthComponent::sliderValueChanged(Slider * slider)
 
   // Starting Offset
   else if (slider == &mStartingOffsetSlider)
+  {
     activeGrain.mStartingOffset = static_cast<int>(mStartingOffsetSlider.getValue());
+    repaint();
+  }
 
   // Cloud Size
   else if (slider == &mCloudSizeSlider)
-  {
     activeGrain.SetCloudSize(static_cast<int>(mCloudSizeSlider.getValue()));
-  }
 
   // Pitch Offset Min
   else if (slider == &mPitchOffsetMinSlider)
@@ -436,6 +437,51 @@ void GranularSynthComponent::paint(Graphics& g)
      g.setColour(Colour(juce::uint8(0), juce::uint8(0), juce::uint8(255), juce::uint8(127)));
      g.fillRect(Rectangle<float>(juce::Point<float>(static_cast<float>(drawPosition), static_cast<float>(thumbnailBounds.getY())), 
                                  juce::Point<float>(static_cast<float>(endDrawPosition), static_cast<float>(thumbnailBounds.getBottom()))));
+
+     // Get Random Starting/Ending Position
+     if (activeGrain.mStartingOffset > 0)
+     {
+       // Draw Starting Value Range
+       auto minRandomPosition = (activeGrain.GetCentroidSample() - activeGrain.mStartingOffset) / activeGrain.mSamplingRate;
+       if (minRandomPosition < 0)
+         minRandomPosition = 0;
+
+       auto drawStartingMinPosition = (minRandomPosition / audioLength) * thumbnailBounds.getWidth() + thumbnailBounds.getX();
+
+       double maxRandomPosition = (activeGrain.GetCentroidSample() + activeGrain.mStartingOffset);
+       if (maxRandomPosition >= activeGrain.GetSize())
+         maxRandomPosition = activeGrain.GetSize();
+       maxRandomPosition /= activeGrain.mSamplingRate;
+
+       auto drawStartingMaxPosition = (maxRandomPosition / audioLength) * thumbnailBounds.getWidth() + thumbnailBounds.getX();
+
+
+       g.setColour(Colour(juce::uint8(0), juce::uint8(150), juce::uint8(0), juce::uint8(110)));
+       g.fillRect(Rectangle<float>(juce::Point<float>(static_cast<float>(drawStartingMinPosition), static_cast<float>(thumbnailBounds.getY())),
+                                    juce::Point<float>(static_cast<float>(drawStartingMaxPosition), static_cast<float>(thumbnailBounds.getBottom()))));
+
+
+       // Draw Ending Range Based on Starting Value
+       minRandomPosition = ((activeGrain.GetCentroidSample() - activeGrain.mStartingOffset) / activeGrain.mSamplingRate) + (grainDuration / 1000.0);;
+       if (minRandomPosition < 0)
+         minRandomPosition = 0;
+
+       drawStartingMinPosition = (minRandomPosition / audioLength) * thumbnailBounds.getWidth() + thumbnailBounds.getX();
+
+       maxRandomPosition = (activeGrain.GetCentroidSample() + activeGrain.mStartingOffset);
+       if (maxRandomPosition >= activeGrain.GetSize())
+         maxRandomPosition = activeGrain.GetSize();
+       maxRandomPosition /= activeGrain.mSamplingRate;
+       maxRandomPosition += (grainDuration / 1000.0);
+
+       drawStartingMaxPosition = (maxRandomPosition / audioLength) * thumbnailBounds.getWidth() + thumbnailBounds.getX();
+
+
+       g.setColour(Colour(juce::uint8(150), juce::uint8(0), juce::uint8(0), juce::uint8(110)));
+       g.fillRect(Rectangle<float>(juce::Point<float>(static_cast<float>(drawStartingMinPosition), static_cast<float>(thumbnailBounds.getY())),
+                                    juce::Point<float>(static_cast<float>(drawStartingMaxPosition), static_cast<float>(thumbnailBounds.getBottom()))));
+     }
+       
 
     }
   }

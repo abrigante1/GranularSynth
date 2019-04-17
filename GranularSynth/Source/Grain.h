@@ -131,6 +131,9 @@ public:
   //! Scalar Value for the Release Duration of the ADSR (in ms)
   double mEnvelopeRelease = 100.0;
 
+  //! Sampling Rate of the Active Grain
+  double mSamplingRate = 0.0;
+
 private:
   //================================VARIABLES=====================================
   
@@ -174,7 +177,6 @@ private:
 
 
   int mWaveSize = 0;        //!< The Size of the Audio Waveform being used
-  int mSamplingRate;        //!< Sampling Rate of the Audio used by the Grain Cloud
 
   bool mHasValidWAVFile;    //!< Boolean for whether or not the Grain has a valid WAV file.
 

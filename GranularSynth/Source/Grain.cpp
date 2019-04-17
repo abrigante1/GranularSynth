@@ -201,8 +201,23 @@ void GrainCloud::AddGrains(int count)
 {
   for (int i = 0; i < count; ++i)
   {
-    grains.push_back(GrainData());
-    RandomizeGrain(grains.back());
+      // Add a New Grain and Randomize it
+      grains.push_back(GrainData());
+      RandomizeGrain(grains.back());
+
+      // If are polyphonic and the user doesn't want randomized starting points
+      // ensure all voices are identical.
+      if ((mCloudSize >= 1) && (mStartingOffset == 0))
+      {
+        auto& newGrain = grains.back();
+        auto& masterGrain = grains.front();
+        newGrain.mStartingSample = masterGrain.mStartingSample;
+        newGrain.mCurrentSample[0] = masterGrain.mCurrentSample[0];
+        newGrain.mCurrentSample[1] = masterGrain.mCurrentSample[1];
+        newGrain.mEndSample = masterGrain.mEndSample;
+        newGrain.mInRelease = masterGrain.mInRelease;
+        newGrain.envelope = masterGrain.envelope;
+      }
   }
 
   mCloudSize += count;

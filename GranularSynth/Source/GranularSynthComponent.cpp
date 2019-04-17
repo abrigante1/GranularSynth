@@ -250,11 +250,17 @@ void GranularSynthComponent::sliderValueChanged(Slider * slider)
 {
   // Centroid Sample
   if (slider == &mCentroidSampleSlider)
+  {
     activeGrain.SetCentroidSample(static_cast<int>(mCentroidSampleSlider.getValue()));
+    repaint();
+  }
 
   // Gain Duration
   else if (slider == &mGrainDurationSlider)
+  {
     activeGrain.SetDuration(static_cast<int>(mGrainDurationSlider.getValue()));
+    repaint();
+  }
 
   // Starting Offset
   else if (slider == &mStartingOffsetSlider)
@@ -262,7 +268,9 @@ void GranularSynthComponent::sliderValueChanged(Slider * slider)
 
   // Cloud Size
   else if (slider == &mCloudSizeSlider)
-    activeGrain.SetCloudSize(static_cast<int>(mCloudSizeSlider.getValue())); 
+  {
+    activeGrain.SetCloudSize(static_cast<int>(mCloudSizeSlider.getValue()));
+  }
 
   // Pitch Offset Min
   else if (slider == &mPitchOffsetMinSlider)
@@ -365,8 +373,9 @@ void GranularSynthComponent::paint(Graphics& g)
     {
       g.setColour(Colours::transparentBlack);
       g.fillRect(thumbnailBounds);
-      g.setColour(Colours::aquamarine);
+      g.setColour(Colours::azure);
 
+      // Draw Waveform
       double audioLength = mThumbnail.getTotalLength();
       mThumbnail.drawChannels(g,
         thumbnailBounds,
@@ -374,7 +383,35 @@ void GranularSynthComponent::paint(Graphics& g)
         audioLength,
         1.0f);
 
-     // auto audioPosition = (activeGrain.GetCentroidSample();
+      // Draw Current Sample Line
+     auto audioPosition = (activeGrain.GetCentroidSample() / activeGrain.mSamplingRate);
+     auto drawPosition ( (audioPosition / audioLength) * thumbnailBounds.getWidth() + thumbnailBounds.getX());
+     g.setColour(Colours::green);
+     g.drawLine(static_cast<float>(drawPosition), 
+                static_cast<float>(thumbnailBounds.getY()), 
+                static_cast<float>(drawPosition), 
+                static_cast<float>(thumbnailBounds.getBottom()),
+                2.0f);
+
+
+     double grainDuration = mGrainDurationSlider.getValue();
+
+     // Get the Current Position in the Waveform and Add the Grain Duration
+     audioPosition = (activeGrain.GetCentroidSample() / activeGrain.mSamplingRate) + (grainDuration / 1000.0);
+     auto endDrawPosition = ( (audioPosition / audioLength) * thumbnailBounds.getWidth() + thumbnailBounds.getX());
+     
+     // Draw End Duration Sample Line
+     g.setColour(Colours::red);
+     g.drawLine(static_cast<float>(endDrawPosition), 
+                static_cast<float>(thumbnailBounds.getY()), 
+                static_cast<float>(endDrawPosition), 
+                static_cast<float>(thumbnailBounds.getBottom()),
+                2.0f);
+     
+     // Draw a Box Highlighting the Selected Section of the Waveform
+     g.setColour(Colour(juce::uint8(0), juce::uint8(0), juce::uint8(255), juce::uint8(127)));
+     g.fillRect(Rectangle<float>(juce::Point<float>(static_cast<float>(drawPosition), static_cast<float>(thumbnailBounds.getY())), 
+                                 juce::Point<float>(static_cast<float>(endDrawPosition), static_cast<float>(thumbnailBounds.getBottom()))));
 
     }
   }
@@ -440,6 +477,7 @@ void GranularSynthComponent::openFile()
 
       // Set the Active Grain's Source Audio File to the New Source
       activeGrain.SetAudioSource(*reader);
+      activeGrain.mSamplingRate = reader->sampleRate;
 
       // Update the Starting Sample Slider Range
       mCentroidSampleSlider.setRange (1, activeGrain.GetSize());

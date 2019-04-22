@@ -1,12 +1,14 @@
-/**************************************************************************
+/*****************************************************************************/
 /*!
-\file GranularSynthComponent.h
+\file   GranularSynthComponent.h
 \author Anthony Brigante
+\par    email: anthonypbrigante\@gmail.com
+\par    GitHub Repository: https://github.com/abrigante1/GranularSynth
 \brief
   The Base Synth Component Class. This Describes the Runtime Logic
   of the Base Audio App Component.
-
-**************************************************************************/
+*/
+/*****************************************************************************/
 
 #pragma once
 

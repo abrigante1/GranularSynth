@@ -1,10 +1,14 @@
-/*
-  ==============================================================================
-
-    This file was auto-generated!
-
-  ==============================================================================
+/*****************************************************************************/
+/*!
+\file   GranularSynthComponent.cpp
+\author Anthony Brigante
+\par    email: anthonypbrigante\@gmail.com
+\par    GitHub Repository: https://github.com/abrigante1/GranularSynth
+\brief
+  The Base Synth Component Class. This is the implementation the Runtime Logic
+  of the Base Audio App Component.
 */
+/*****************************************************************************/
 
 // async vs sync granular synthesis
 

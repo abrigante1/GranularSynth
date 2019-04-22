@@ -1,12 +1,14 @@
-/*
-  ==============================================================================
-
-    This file was auto-generated!
-
-    It contains the basic startup code for a JUCE application.
-
-  ==============================================================================
+/*****************************************************************************/
+/*!
+\file   GranularSynthComponent.h
+\author Anthony Brigante
+\par    email: anthonypbrigante\@gmail.com
+\par    GitHub Repository: https://github.com/abrigante1/GranularSynth
+\brief
+  This file was auto-generated!
+  It contains the basic startup code for a JUCE application.
 */
+/*****************************************************************************/
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "GranularSynthComponent.h"

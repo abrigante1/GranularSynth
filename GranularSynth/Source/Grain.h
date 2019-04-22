@@ -1,12 +1,14 @@
-/**************************************************************************
+/*****************************************************************************/
 /*!
-\file Grain.h
+\file   Grain.h
 \author Anthony Brigante
+\par    email: anthonypbrigante\@gmail.com
+\par    GitHub Repository: https://github.com/abrigante1/GranularSynth
 \brief
   Definition for the Grain Struct. 
   The Grain Class describes the properties of a 'grain'.
-
-**************************************************************************/
+*/
+/*****************************************************************************/
 #pragma once
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "WaveGenerator.h"

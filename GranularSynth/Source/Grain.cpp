@@ -1,3 +1,14 @@
+/*****************************************************************************/
+/*!
+\file   Grain.cpp
+\author Anthony Brigante
+\par    email: anthonypbrigante\@gmail.com
+\par    GitHub Repository: https://github.com/abrigante1/GranularSynth
+\brief
+  This is the Implementation of the GrainCloud Class
+*/
+/*****************************************************************************/
+
 #include "Grain.h"
 #define LEFT_CHANNEL 0
 #define RIGHT_CHANNEL 1
